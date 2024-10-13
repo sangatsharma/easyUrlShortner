@@ -1,0 +1,16 @@
+# Node.js and React
+Backend/node_modules/
+Backend/dist/
+Backend/build/
+
+Frontend/node_modules/
+Frontend/dist/
+
+# Logs and temporary files
+npm-debug.log*
+Backend/.env
+Frontend/.env
+
+# IDE files
+.vscode/
+.idea/
