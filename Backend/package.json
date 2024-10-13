@@ -4,9 +4,9 @@
   "description": "This backend holds the api for  url shortening. ",
   "main": "server.js",
   "scripts": {
-    "start": "npx tsc && node ./dist/server.js",
+    "start": "tsc && node ./dist/server.js",
     "dev": "nodemon",
-    "build": "npx tsc",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sangat Sharma",
