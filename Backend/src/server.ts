@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: `${process.env.MODE}`,
+    origin: ["http://localhost:5001", "https://easy-url-blue.vercel.app/"],
     credentials: true,
   })
 );
