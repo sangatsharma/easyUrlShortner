@@ -28,6 +28,7 @@ export const getAllUrls = async (
     const urls = await easyUrlModel.find();
     res.status(200).json({ success: true, urls: urls });
   } catch (error) {
+    res.send("URL not found");
     console.error("Error fetching URLs:", error);
     res.status(500).json({ error: "Failed to fetch URLs." });
   }
@@ -40,11 +41,13 @@ export const getUrl = async (
   try {
     const url = await easyUrlModel.findOne({ shortId: req.params.id });
     if (!url) {
+      res.send("URL not found");
       res.status(404).json({ error: "URL not found." });
       return;
     }
     res.status(200).json({ success: "true", url: url });
   } catch (error) {
+    res.send("URL not found");
     console.error("Error fetching URL:", error);
     res.status(500).json({ error: "Failed to fetch URL." });
   }

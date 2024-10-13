@@ -17,7 +17,7 @@ app.use(express_1.default.json());
 //handles URL-encoded data
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)({
-    origin: `${process.env.MODE}`,
+    origin: ["http://localhost:5001", "https://easy-url-blue.vercel.app/"],
     credentials: true,
 }));
 app.use("/", easyUrlroutes_1.default);
