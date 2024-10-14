@@ -1,24 +1,26 @@
 import * as React from "react";
-import Header from "./Components/Header";
-import UrlShortener from "./Components/UrlShortener";
-import Footer from "./Components/Footer";
-import FeaturesSection from "./Components/FeaturesSection";
-import CTASection from "./Components/CTASection";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Homepage from "./Pages/Homepage";
+import PageNotFound from "./Pages/PageNotFound";
+import RedirectPage from "./Pages/RedirectPage";
+import RootPageLayout from "./Pages/RootPageLayout";
 
 interface IAppProps {}
 
 const App: React.FunctionComponent<IAppProps> = () => {
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <Header />
-      <main className="flex-grow">
-        <UrlShortener />
-        <CTASection />
-        <FeaturesSection />
-      </main>
-      <Footer />
-    </div>
-  );
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <RootPageLayout />,
+      errorElement: <PageNotFound />,
+      children: [
+        { path: ":id", element: <RedirectPage /> },
+        { path: "/", element: <Homepage /> },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 };
 
 export default App;
