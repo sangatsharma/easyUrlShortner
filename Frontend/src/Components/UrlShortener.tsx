@@ -22,12 +22,12 @@ const UrlShortener: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.post<ApiResponse>(
-        "https://easy-url-blue.vercel.app/",
+      const response = await axios.post(
+        "http://localhost:5001/",
         { originalUrl: url }
       );
-      console.log(response.data);
-      setShortLink(response.data.shortUrl);
+      console.log(response.data.url.shortId);
+      setShortLink(`easyurl.me/${response.data.url.shortId}`);
     } catch (err) {
       setError("Failed to shorten the URL. Please try again.");
     } finally {
