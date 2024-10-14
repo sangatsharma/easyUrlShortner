@@ -26,7 +26,7 @@ const UrlShortener: React.FC = () => {
         "http://localhost:5001/",
         { originalUrl: url }
       );
-      console.log(response.data.url.shortId);
+      console.log(response.data);
       setShortLink(`easyurl.me/${response.data.url.shortId}`);
     } catch (err) {
       setError("Failed to shorten the URL. Please try again.");
