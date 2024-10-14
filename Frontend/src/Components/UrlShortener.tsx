@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import ShortLinkDisplay from "./ShortLinkDisplay";
-
-
+import { isValidUrl } from "../utils/validUrlChecker.ts";
 
 const UrlShortener: React.FC = () => {
   const [url, setUrl] = useState<string>("");
@@ -11,25 +10,24 @@ const UrlShortener: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleShorten = async () => {
-    if (!url) {
+    if (isValidUrl(url)) {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}`, {
+          originalUrl: url,
+        });
+        console.log(response.data.url);
+        setShortLink(`easyurl.me/${response.data.url.shortId}`);
+      } catch (err) {
+        setError("Failed to shorten the URL. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    } else {
       setError("Please enter a valid URL.");
       return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await axios.post(
-        "https://easy-url-blue.vercel.app/",
-        { originalUrl: url }
-      );
-      console.log(response.data.url);
-      setShortLink(`easyurl.me/${response.data.url.shortId}`);
-    } catch (err) {
-      setError("Failed to shorten the URL. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -40,7 +38,7 @@ const UrlShortener: React.FC = () => {
       </h2>
       <input
         type="text"
-        placeholder="Enter your URL here"
+        placeholder="Enter your full URL here"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         className="w-full p-2 border rounded mb-4"
