@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import ShortLinkDisplay from "./ShortLinkDisplay";
 
-interface ApiResponse {
-  shortUrl: string;
-}
+
 
 const UrlShortener: React.FC = () => {
   const [url, setUrl] = useState<string>("");
@@ -26,7 +24,7 @@ const UrlShortener: React.FC = () => {
         "http://localhost:5001/",
         { originalUrl: url }
       );
-      console.log(response.data);
+      console.log(response.data.url);
       setShortLink(`easyurl.me/${response.data.url.shortId}`);
     } catch (err) {
       setError("Failed to shorten the URL. Please try again.");
