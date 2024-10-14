@@ -21,7 +21,7 @@ const UrlShortener: React.FC = () => {
       setError(null);
 
       const response = await axios.post(
-        "http://localhost:5001/",
+        "https://easy-url-blue.vercel.app/",
         { originalUrl: url }
       );
       console.log(response.data.url);
