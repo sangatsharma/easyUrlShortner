@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 // List of allowed domains
-const allowedDomains = [
- "easyurl.me", 
-];
+const allowedDomains = ["https://www.easyurl.me", "https://easyurl.me"];
 
 /**
  * Middleware to validate the Referer header.
@@ -14,7 +12,7 @@ export const validateReferer = (
   next: NextFunction
 ): void => {
   const referer = req.get("Referer") || ""; // Get the Referer header
-console.log("referer",referer);
+  console.log("referer", referer);
   const isValidReferrer = allowedDomains.some((domain) =>
     referer.startsWith(domain)
   );
