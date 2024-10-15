@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 // List of allowed domains
-const allowedDomains = [""];
+const allowedDomains = ["https://www.easyurl.me", "https://easyurl.me", "http://localhost:5173"];
 
 /**
  * Middleware to validate the Referer header.

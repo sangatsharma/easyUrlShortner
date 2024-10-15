@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import {
   createUrl,
   getAllUrls,
@@ -9,14 +9,22 @@ import { validateReferer } from "../middleware/validateReferer";
 
 const router = express.Router();
 
-router.post("/api/shortUrl", createUrl);
-router.get("/", (req: express.Request, res: express.Response) => {
+// Route to create a short URL
+router.post("/api/shortUrl", validateReferer, createUrl);
+
+// Home route
+router.get("/", (req: Request, res: Response) => {
   console.log("Received request for home route");
   res.send("Welcome to EasyUrl");
 });
 
-router.get("/api/urls/All", getAllUrls);
-router.get("/api/getLongUrl/:id",validateReferer, getUrl);
-router.delete("/api/shorturl/:id", deleteUrl);
+// Route to get all URLs (secured with validateReferer middleware)
+router.get("/api/urls/All", validateReferer, getAllUrls);
+
+// Route to get long URL by ID
+router.get("/api/getLongUrl/:id", validateReferer, getUrl);
+
+// Route to delete a short URL by ID
+router.delete("/api/shorturl/:id", validateReferer, deleteUrl);
 
 export default router;
