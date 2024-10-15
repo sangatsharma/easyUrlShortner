@@ -12,30 +12,33 @@ const RedirectPage: React.FC = () => {
 
   useEffect(() => {
     if (id !== undefined) {
-      getOriginalUrl(id);
+      window.location.href = `${
+        import.meta.env.VITE_SERVER_URL
+      }/api/getLongUrl/${id}`;
+      // getOriginalUrl(id);
     }
   }, [id]);
 
-  const getOriginalUrl = async (id: string) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/${id}`,
-        { withCredentials: true }
-      );
-      console.log(response.data);
-      if (isValidUrl(response.data.url.originalUrl)) {
-        // Redirect to the original URL
-        window.location.href = response.data.url.originalUrl;
-      } else {
-        setError("Invalid URL");
-      }
-    } catch (err) {
-      console.error("Error in getting original URL:", err);
-      setError("Failed to retrieve the original URL.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const getOriginalUrl = async (id: string) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `${import.meta.env.VITE_SERVER_URL}/${id}`,
+  //       { withCredentials: true }
+  //     );
+  //     console.log(response.data);
+  //     if (isValidUrl(response.data.url.originalUrl)) {
+  //       // Redirect to the original URL
+  //       window.location.href = response.data.url.originalUrl;
+  //     } else {
+  //       setError("Invalid URL");
+  //     }
+  //   } catch (err) {
+  //     console.error("Error in getting original URL:", err);
+  //     setError("Failed to retrieve the original URL.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   if (loading) {
     return (

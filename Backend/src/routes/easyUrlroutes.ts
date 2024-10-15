@@ -5,23 +5,18 @@ import {
   getUrl,
   deleteUrl,
 } from "../controllers/easyUrlController";
+import { validateReferer } from "../middleware/validateReferer";
 
 const router = express.Router();
 
-router.post("/", createUrl);
+router.post("/api/shortUrl", createUrl);
 router.get("/", (req: express.Request, res: express.Response) => {
   console.log("Received request for home route");
   res.send("Welcome to EasyUrl");
 });
 
-router.get("/test", (req, res) => {
-  res.send("Test route works!");
-});
-router.get("/urls/All", (req, res) => {
-  console.log("Received request for all URLs");
-  getAllUrls(req, res);
-});
-router.get("/:id", getUrl);
-router.delete("/:id", deleteUrl);
+router.get("/api/urls/All", getAllUrls);
+router.get("/api/getLongUrl/:id",validateReferer, getUrl);
+router.delete("/api/shorturl/:id", deleteUrl);
 
 export default router;

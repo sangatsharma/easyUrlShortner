@@ -12,7 +12,7 @@ export const createUrl = async (
       res.status(400).json({ error: "Invalid URL." });
     }
     const shortId = await generateUniqueId();
-    const url = await easyUrlModel.create({ originalUrl,shortId });
+    const url = await easyUrlModel.create({ originalUrl, shortId });
     res.status(201).json({ success: true, url: url });
   } catch (error) {
     console.error("Error creating URL:", error);
@@ -45,7 +45,7 @@ export const getUrl = async (
       res.status(404).json({ error: "URL not found." });
       return;
     }
-    res.status(200).json({ success: "true", url: url });
+    res.status(200).redirect(url.originalUrl);
   } catch (error) {
     res.send("URL not found");
     console.error("Error fetching URL:", error);

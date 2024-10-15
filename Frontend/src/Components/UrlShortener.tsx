@@ -15,7 +15,7 @@ const UrlShortener: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}`, {
+        const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/shortUrl`, {
           originalUrl: url,
         });
         console.log(response.data.url);
