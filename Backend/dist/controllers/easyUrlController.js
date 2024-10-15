@@ -47,16 +47,14 @@ const getUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const url = yield dbmodel_1.default.findOne({ shortId: req.params.id });
         if (!url) {
-            res.send("URL not found");
-            res.status(404).json({ error: "URL not found." });
+            const referer = req.get("Referer") || "";
+            res.status(404).redirect(`${referer}404`);
             return;
         }
-        res.status(200).json({ success: "true", url: url });
+        res.status(200).redirect(url.originalUrl);
     }
     catch (error) {
-        res.send("URL not found");
         console.error("Error fetching URL:", error);
-        res.status(500).json({ error: "Failed to fetch URL." });
     }
 });
 exports.getUrl = getUrl;

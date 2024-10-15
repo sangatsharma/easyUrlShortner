@@ -16,6 +16,15 @@ const App: React.FunctionComponent<IAppProps> = () => {
       children: [
         { path: ":id", element: <RedirectPage /> },
         { path: "/", element: <Homepage /> },
+        {
+          path: "/404",
+          element: (
+            <div className="flex flex-col min-h-screen bg-gray-100">
+              <h3 className="text-4xl text-center mt-4">404 </h3>
+              <h1 className="text-6xl text-center mt-4">Page not found.</h1>
+            </div>
+          ),
+        },
       ],
     },
   ]);

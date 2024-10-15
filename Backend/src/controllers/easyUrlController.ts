@@ -41,15 +41,13 @@ export const getUrl = async (
   try {
     const url = await easyUrlModel.findOne({ shortId: req.params.id });
     if (!url) {
-      res.send("URL not found");
-      res.status(404).json({ error: "URL not found." });
+      const referer = req.get("Referer") || ""; 
+      res.status(404).redirect(`${referer}404`);
       return;
     }
     res.status(200).redirect(url.originalUrl);
   } catch (error) {
-    res.send("URL not found");
     console.error("Error fetching URL:", error);
-    res.status(500).json({ error: "Failed to fetch URL." });
   }
 };
 export const deleteUrl = async (
