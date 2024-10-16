@@ -3,13 +3,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isRedisReady = void 0;
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const dbConfig_1 = __importDefault(require("./config/dbConfig"));
 const easyUrlroutes_1 = __importDefault(require("./routes/easyUrlroutes"));
+const redisConfig_1 = require("./config/redisConfig");
+exports.isRedisReady = false;
 dotenv_1.default.config();
 (0, dbConfig_1.default)();
+redisConfig_1.redisClient
+    .connect()
+    .then(() => {
+    exports.isRedisReady = true;
+    console.log("Connected to Redis:", exports.isRedisReady);
+})
+    .catch((err) => {
+    console.error("Redis connection error:", exports.isRedisReady);
+    //console.error("Redis connection error:", err);
+});
 const PORT = process.env.PORT || 5000;
 const app = (0, express_1.default)();
 //middleware to parse incoming JSON payloads and makes them available on req.body.

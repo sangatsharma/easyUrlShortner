@@ -15,46 +15,79 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateUniqueId = generateUniqueId;
 const nanoid_1 = require("nanoid");
 const dbmodel_1 = __importDefault(require("../model/dbmodel"));
-// Function to generate the initial length for the short ID based on the last entry
-function getInitialLength() {
+// Define constants for batch size and ID generation
+const BATCH_SIZE = 100; // Adjust based on traffic
+const DEFAULT_ID_LENGTH = 4;
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+let idBatch = new Set(); // Stores pre-generated unique IDs
+/**
+ * Generates a nanoid with the given length.
+ * @param length - The length of the nanoid to generate.
+ * @returns {string} - A new nanoid.
+ */
+const generateNanoId = (length) => {
+    const alphanumericNanoid = (0, nanoid_1.customAlphabet)(alphabet, length);
+    return alphanumericNanoid();
+};
+/**
+ * Refills the in-memory batch of unique IDs asynchronously.
+ * @param length - Length of the IDs to generate.
+ */
+function refillIdBatch(length) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const lastUrl = yield dbmodel_1.default.findOne().sort({ _id: -1 }).exec(); // Latest entry
-            return lastUrl ? lastUrl.shortId.toString().length : 3; // Default to 3 if no entries
+        console.log("Refilling ID batch...");
+        while (idBatch.size < BATCH_SIZE) {
+            const newId = generateNanoId(length);
+            const exists = yield dbmodel_1.default.findOne({ shortId: newId }).exec(); // Check DB for collision
+            if (!exists)
+                idBatch.add(newId);
         }
-        catch (error) {
-            console.error("Error fetching the last URL:", error);
-            return 3; // Default to 3 if there's an error
-        }
+        console.log(`ID batch refilled with ${idBatch.size} IDs.`);
     });
 }
 /**
- * Generates a unique short ID, increasing length only when collisions occur.
+ * Generates a unique short ID, using pre-generated IDs from memory.
+ * If the batch runs low, it triggers an async refill.
  * @returns {Promise<string>} - A unique short ID.
  */
 function generateUniqueId() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let length = yield getInitialLength();
-            console.log(`Starting with length: ${length}`);
-            let shortId;
-            while (true) {
-                // Define an alphabet that includes only alphanumeric characters
-                const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                const alphanumericNanoid = (0, nanoid_1.customAlphabet)(alphabet, length); // Length of the ID
-                shortId = alphanumericNanoid();
-                console.log(`Checking for ID: ${shortId}`);
-                const exists = yield dbmodel_1.default.findOne({ shortId }).exec();
-                if (!exists) {
-                    return shortId; // Found a unique ID
-                }
-                console.log(`Collision detected for ID: ${shortId}. Increasing length.`);
-                length++; // Increase length on collision
+            // If the batch is empty, refill synchronously to avoid failures
+            if (idBatch.size === 0) {
+                console.warn("ID batch empty. Refilling synchronously...");
+                const initialLength = yield getInitialLength();
+                yield refillIdBatch(initialLength);
             }
+            // Extract an ID from the batch
+            const [uniqueId] = idBatch;
+            idBatch.delete(uniqueId); // Remove used ID
+            // If the batch is running low, refill in the background
+            if (idBatch.size < BATCH_SIZE / 2) {
+                const initialLength = yield getInitialLength(); // Use current length logic
+                refillIdBatch(initialLength); // Refill asynchronously
+            }
+            return uniqueId;
         }
         catch (error) {
             console.error("Error generating unique ID:", error);
-            throw new Error("Failed to generate a unique short ID."); // Re-throw or handle the error as needed
+            throw new Error("Failed to generate a unique short ID.");
+        }
+    });
+}
+/**
+ * Gets the initial length for the short ID based on the last entry.
+ * @returns {Promise<number>} - The length of the short ID.
+ */
+function getInitialLength() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const lastUrl = yield dbmodel_1.default.findOne().sort({ _id: -1 }).exec();
+            return lastUrl ? lastUrl.shortId.toString().length : DEFAULT_ID_LENGTH;
+        }
+        catch (error) {
+            console.error("Error fetching the last URL:", error);
+            return DEFAULT_ID_LENGTH;
         }
     });
 }

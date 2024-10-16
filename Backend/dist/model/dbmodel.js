@@ -10,7 +10,7 @@ const urlSchema = new mongoose_1.default.Schema({
         required: true,
         unique: true,
     },
-    originalUrl: { type: String, required: true },
+    originalUrl: { type: String, unique: true, index: true }, // Index for faster lookups
     clicks: { type: Number, required: true, default: 0 },
     createdAt: { type: Date, required: true, default: Date.now },
 });

@@ -17,7 +17,8 @@
     "express": "^4.21.1",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.1",
-    "nanoid": "^3.0.0"
+    "nanoid": "^3.0.0",
+    "redis": "^4.7.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Document } from "mongoose";
 interface IUrl extends Document {
-  shortId: string; 
+  shortId: string;
   originalUrl: string;
   clicks: number;
   createdAt: Date;
@@ -13,7 +13,7 @@ const urlSchema = new mongoose.Schema<IUrl>({
     required: true,
     unique: true,
   },
-  originalUrl: { type: String, required: true },
+  originalUrl: { type: String, unique: true, index: true }, // Index for faster lookups
   clicks: { type: Number, required: true, default: 0 },
   createdAt: { type: Date, required: true, default: Date.now },
 });
