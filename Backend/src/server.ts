@@ -5,19 +5,22 @@ import connectDb from "./config/dbConfig";
 import easyUrlRoutes from "./routes/easyUrlroutes";
 import { redisClient } from "./config/redisConfig";
 
-export let isRedisReady = false;
+ let isRedisReady = false;
 dotenv.config();
 connectDb();
 redisClient
   .connect()
   .then(() => {
     isRedisReady = true;
-    console.log("Connected to Redis:",isRedisReady);
+    console.log("Connected to Redis:", isRedisReady);
   })
   .catch((err) => {
-    console.error("Redis connection error:",isRedisReady);
+    isRedisReady = false;
+    console.error("Redis connection error:", isRedisReady);
     //console.error("Redis connection error:", err);
   });
+// Function to get the current Redis readiness status
+export const getRedisStatus = (): boolean => isRedisReady;
 
 const PORT = process.env.PORT || 5000;
 const app = express();
