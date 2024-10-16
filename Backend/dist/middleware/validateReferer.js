@@ -5,7 +5,7 @@ exports.validateReferer = void 0;
 const allowedDomains = [
     "https://www.easyurl.me",
     "https://easyurl.me",
-    "http://localhost:5173", // Local development
+    "http://localhost:5173", "" // Local development
 ];
 /**
  * Middleware to validate the Referer header.

@@ -3,9 +3,21 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDb from "./config/dbConfig";
 import easyUrlRoutes from "./routes/easyUrlroutes";
+import { redisClient } from "./config/redisConfig";
 
+export let isRedisReady = false;
 dotenv.config();
 connectDb();
+redisClient
+  .connect()
+  .then(() => {
+    isRedisReady = true;
+    console.log("Connected to Redis:",isRedisReady);
+  })
+  .catch((err) => {
+    console.error("Redis connection error:",isRedisReady);
+    //console.error("Redis connection error:", err);
+  });
 
 const PORT = process.env.PORT || 5000;
 const app = express();
