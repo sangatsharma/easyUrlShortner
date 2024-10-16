@@ -1,6 +1,6 @@
 import { redisClient } from "../config/redisConfig";
 import { getRedisStatus } from "../server";
-let isRedisReady = getRedisStatus();
+let isRedisReady:boolean = getRedisStatus();
 export const getURLFromCache = async (text: string) => {
   if (isRedisReady) {
     const value = await redisClient.get(text);
