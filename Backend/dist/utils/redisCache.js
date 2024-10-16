@@ -12,20 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.setURLInCache = exports.getURLFromCache = void 0;
 const redisConfig_1 = require("../config/redisConfig");
 const server_1 = require("../server");
+let isRedisReady = (0, server_1.getRedisStatus)();
 const getURLFromCache = (text) => __awaiter(void 0, void 0, void 0, function* () {
-    if (server_1.isRedisReady) {
+    if (isRedisReady) {
         const value = yield redisConfig_1.redisClient.get(text);
         if (value) {
             console.log(`Got value: ${value}`);
             return value;
         }
     }
-    ;
     return "";
 });
 exports.getURLFromCache = getURLFromCache;
 const setURLInCache = (shortId, originalURL) => __awaiter(void 0, void 0, void 0, function* () {
-    if (server_1.isRedisReady) {
+    if (isRedisReady) {
         yield redisConfig_1.redisClient.set(shortId, originalURL, {
             EX: 3600, // Set the expiration time to 3600 seconds
         });
