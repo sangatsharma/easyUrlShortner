@@ -3,24 +3,25 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDb from "./config/dbConfig";
 import easyUrlRoutes from "./routes/easyUrlroutes";
-import { redisClient } from "./config/redisConfig";
+import { getRedisStatus, redisClient, setRedisStatus } from "./config/redisConfig";
 
- let isRedisReady = false;
+
 dotenv.config();
 connectDb();
+
 redisClient
   .connect()
   .then(() => {
-    isRedisReady = true;
-    console.log("Connected to Redis:", isRedisReady);
+    setRedisStatus(true);
+    console.log("Connected to Redis:", getRedisStatus());
   })
   .catch((err) => {
-    isRedisReady = false;
-    console.error("Redis connection error:", isRedisReady);
+    setRedisStatus(false);
+    console.error("Redis connection error:", err);
     //console.error("Redis connection error:", err);
   });
-// Function to get the current Redis readiness status
-export const getRedisStatus = (): boolean => isRedisReady;
+
+
 
 const PORT = process.env.PORT || 5000;
 const app = express();

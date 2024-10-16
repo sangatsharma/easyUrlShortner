@@ -33,7 +33,7 @@ const UrlShortener: React.FC = () => {
 
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/api/shortUrl`,
-        { originalUrl: url }
+        { originalUrl: formattedUrl }
       );
       setShortLink(`easyurl.me/${response.data.url.shortId}`);
     } catch (err) {

@@ -3,30 +3,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRedisStatus = void 0;
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const dbConfig_1 = __importDefault(require("./config/dbConfig"));
 const easyUrlroutes_1 = __importDefault(require("./routes/easyUrlroutes"));
 const redisConfig_1 = require("./config/redisConfig");
-let isRedisReady = false;
 dotenv_1.default.config();
 (0, dbConfig_1.default)();
 redisConfig_1.redisClient
     .connect()
     .then(() => {
-    isRedisReady = true;
-    console.log("Connected to Redis:", isRedisReady);
+    (0, redisConfig_1.setRedisStatus)(true);
+    console.log("Connected to Redis:", (0, redisConfig_1.getRedisStatus)());
 })
     .catch((err) => {
-    isRedisReady = false;
-    console.error("Redis connection error:", isRedisReady);
+    (0, redisConfig_1.setRedisStatus)(false);
+    console.error("Redis connection error:", err);
     //console.error("Redis connection error:", err);
 });
-// Function to get the current Redis readiness status
-const getRedisStatus = () => isRedisReady;
-exports.getRedisStatus = getRedisStatus;
 const PORT = process.env.PORT || 5000;
 const app = (0, express_1.default)();
 //middleware to parse incoming JSON payloads and makes them available on req.body.

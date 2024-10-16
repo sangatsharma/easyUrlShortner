@@ -1,16 +1,25 @@
 import { createClient } from "redis";
 import dotenv from "dotenv";
-dotenv.config(); 
 
+
+dotenv.config();
+let isRedisReady = false;
 export const redisClient = createClient({
   url: process.env.REDIS_CONNECTION_STRING,
 });
+// Check Redis status
+export const getRedisStatus = () => {
+  return isRedisReady;
+};
 
+export const setRedisStatus = (status: boolean) => {
+  isRedisReady = status;
+};
 
 // redisClient
 //   .connect()
 //   .then(async () => {
-    
+
 //     // Example: Store a simple string
 //     await redisClient.set("key", "value");
 //     const value = await redisClient.get("key");
