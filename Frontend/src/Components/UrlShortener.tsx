@@ -19,7 +19,7 @@ const UrlShortener: React.FC = () => {
 
   const handleShorten = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent page reload on form submission
-    const formattedUrl = url.includes("://") ? url : `http://${url}`;
+    const formattedUrl = url.includes("://") ? url : `https://${url}`;
     // Encode the URL to handle spaces and special characters
  
     if (!isValidUrl(formattedUrl)) {
