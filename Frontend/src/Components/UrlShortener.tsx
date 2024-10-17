@@ -2,10 +2,13 @@ import React, { useState, useCallback } from "react";
 import axios from "axios";
 import ShortLinkDisplay from "./ShortLinkDisplay";
 import { isValidUrl } from "../utils/validUrlChecker.ts";
+import QRCodeGenerator from "./QRCodeGenerator.tsx";
+import UrlTable from "./URLtable.tsx";
 
 const UrlShortener: React.FC = () => {
   const [url, setUrl] = useState<string>("");
   const [shortLink, setShortLink] = useState<string | null>(null);
+  const [allLinks, setAllLinks] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,10 +21,12 @@ const UrlShortener: React.FC = () => {
   );
 
   const handleShorten = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent page reload on form submission
+    e.preventDefault();
+    setShortLink(null);
+    // Prevent page reload on form submission
     const formattedUrl = url.includes("://") ? url : `https://${url}`;
     // Encode the URL to handle spaces and special characters
- 
+
     if (!isValidUrl(formattedUrl)) {
       setError("Please enter a valid URL.");
       return;
@@ -36,6 +41,7 @@ const UrlShortener: React.FC = () => {
         { originalUrl: formattedUrl }
       );
       setShortLink(`easyurl.me/${response.data.url.shortId}`);
+      setAllLinks([...allLinks,`https://easyurl.me/${response.data.url.shortId}`]);
     } catch (err) {
       setError("Failed to shorten the URL. Please try again.");
     } finally {
@@ -44,7 +50,7 @@ const UrlShortener: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-4">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-6xl mx-auto mt-4">
       <h2 className="text-2xl font-semibold text-center mb-4">
         Shorten Your URL
       </h2>
@@ -84,6 +90,14 @@ const UrlShortener: React.FC = () => {
         </p>
       )}
       {shortLink && <ShortLinkDisplay shortLink={shortLink} />}
+      {/* <div className="mt-8">
+        <ul className="mt-4 space-y-2">
+          {allLinks.map((link,index) => (
+            <QRCodeGenerator key={index} url={link} />
+          ))}
+        </ul>
+      </div> */}
+      <UrlTable links={[]} />
     </div>
   );
 };

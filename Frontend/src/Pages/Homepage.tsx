@@ -8,7 +8,7 @@ interface IHomepageProps {}
 const Homepage: React.FunctionComponent<IHomepageProps> = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      <main className="flex-grow">
+      <main className="flex-grow w-full">
         <UrlShortener />
         <CTASection />
         <FeaturesSection />
