@@ -88,7 +88,7 @@ const ForgotPassword: React.FC = () => {
     // Clear message after 5 seconds
     setTimeout(() => {
         setMessage('Redirecting to home page...');
-        window.location.href = '/'; // Redirect to home page
+        window.location.href = '/';
     }, 3000);
   };
 
