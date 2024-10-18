@@ -4,7 +4,7 @@ import {
   getAllUrls,
   getUrl,
   deleteUrl,
-} from "../controllers/easyUrlController";
+} from "../controllers/easyUrlcontroller";
 import { validateReferer } from "../middleware/validateReferer";
 
 const router = express.Router();
