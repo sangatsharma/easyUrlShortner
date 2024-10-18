@@ -16,7 +16,7 @@ exports.generateUniqueId = generateUniqueId;
 const nanoid_1 = require("nanoid");
 const dbmodel_1 = __importDefault(require("../model/dbmodel"));
 // Define constants for batch size and ID generation
-const BATCH_SIZE = 50; // Adjust based on traffic
+const BATCH_SIZE = 100; // Adjust based on traffic
 const DEFAULT_ID_LENGTH = 4;
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 let idBatch = new Set(); // Stores pre-generated unique IDs
@@ -36,13 +36,22 @@ const generateNanoId = (length) => {
 function refillIdBatch(length) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("Refilling ID batch...");
-        while (idBatch.size < BATCH_SIZE) {
-            const newId = generateNanoId(length);
-            const exists = yield dbmodel_1.default.findOne({ shortId: newId }).exec(); // Check DB for collision
-            if (!exists)
-                idBatch.add(newId);
+        const idsToGenerate = BATCH_SIZE - idBatch.size;
+        try {
+            const generatedIds = yield Promise.all(Array.from({ length: idsToGenerate }).map(() => __awaiter(this, void 0, void 0, function* () {
+                let newId;
+                do {
+                    newId = generateNanoId(length);
+                } while (yield dbmodel_1.default.findOne({ shortId: newId }).exec());
+                return newId;
+            })));
+            // Add new IDs to the batch
+            generatedIds.forEach((id) => idBatch.add(id));
+            console.log(`ID batch refilled with ${idBatch.size} IDs.`);
         }
-        console.log(`ID batch refilled with ${idBatch.size} IDs.`);
+        catch (error) {
+            console.error("Error refilling ID batch:", error);
+        }
     });
 }
 /**

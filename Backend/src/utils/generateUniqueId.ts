@@ -2,7 +2,7 @@ import { customAlphabet } from "nanoid";
 import easyUrlModel from "../model/dbmodel";
 
 // Define constants for batch size and ID generation
-const BATCH_SIZE = 50; // Adjust based on traffic
+const BATCH_SIZE = 100; // Adjust based on traffic
 const DEFAULT_ID_LENGTH = 4;
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 let idBatch: Set<string> = new Set(); // Stores pre-generated unique IDs
@@ -21,15 +21,30 @@ const generateNanoId = (length: number): string => {
  * Refills the in-memory batch of unique IDs asynchronously.
  * @param length - Length of the IDs to generate.
  */
-async function refillIdBatch(length: number) {
+async function refillIdBatch(length: number): Promise<void> {
   console.log("Refilling ID batch...");
-  while (idBatch.size < BATCH_SIZE) {
-    const newId = generateNanoId(length);
-    const exists = await easyUrlModel.findOne({ shortId: newId }).exec(); // Check DB for collision
-    if (!exists) idBatch.add(newId);
+
+  const idsToGenerate = BATCH_SIZE - idBatch.size;
+
+  try {
+    const generatedIds = await Promise.all(
+      Array.from({ length: idsToGenerate }).map(async () => {
+        let newId;
+        do {
+          newId = generateNanoId(length);
+        } while (await easyUrlModel.findOne({ shortId: newId }).exec());
+        return newId;
+      })
+    );
+
+    // Add new IDs to the batch
+    generatedIds.forEach((id) => idBatch.add(id));
+    console.log(`ID batch refilled with ${idBatch.size} IDs.`);
+  } catch (error) {
+    console.error("Error refilling ID batch:", error);
   }
-  console.log(`ID batch refilled with ${idBatch.size} IDs.`);
 }
+
 
 /**
  * Generates a unique short ID, using pre-generated IDs from memory.
