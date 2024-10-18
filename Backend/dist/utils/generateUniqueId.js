@@ -84,10 +84,10 @@ function generateUniqueId() {
         }
     });
 }
-/**
- * Gets the initial length for the short ID based on the last entry.
- * @returns {Promise<number>} - The length of the short ID.
- */
+// /**
+//  * Gets the initial length for the short ID based on the last entry.
+//  * @returns {Promise<number>} - The length of the short ID.
+//  */
 function getInitialLength() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -100,8 +100,6 @@ function getInitialLength() {
         }
     });
 }
-// import { customAlphabet } from "nanoid";
-// import easyUrlModel from "../model/dbmodel";
 // Function to generate the initial length for the short ID based on the last entry
 // async function getInitialLength(): Promise<number> {
 //   try {
@@ -112,6 +110,7 @@ function getInitialLength() {
 //     return 4; // Default to 3 if there's an error
 //   }
 // }
+// import { customAlphabet } from "nanoid";
 /**
  * Generates a unique short ID, increasing length only when collisions occur.
  * @returns {Promise<string>} - A unique short ID.
@@ -128,13 +127,7 @@ function getInitialLength() {
 //       const alphanumericNanoid = customAlphabet(alphabet, length); // Length of the ID
 //       shortId = alphanumericNanoid();
 //       console.log(`Checking for ID: ${shortId}`);
-//       const exists = await easyUrlModel.findOne({ shortId }).exec();
 //       return shortId; // Found a unique ID
-//       // if (!exists) {
-//       //   return shortId; // Found a unique ID
-//       // }
-//       // console.log(`Collision detected for ID: ${shortId}. Increasing length.`);
-//       // length++; // Increase length on collision
 //     }
 //   } catch (error) {
 //     console.error("Error generating unique ID:", error);

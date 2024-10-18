@@ -77,10 +77,10 @@ export async function generateUniqueId(): Promise<string> {
   }
 }
 
-/**
- * Gets the initial length for the short ID based on the last entry.
- * @returns {Promise<number>} - The length of the short ID.
- */
+// /**
+//  * Gets the initial length for the short ID based on the last entry.
+//  * @returns {Promise<number>} - The length of the short ID.
+//  */
 async function getInitialLength(): Promise<number> {
   try {
     const lastUrl = await easyUrlModel.findOne().sort({ _id: -1 }).exec();
@@ -91,20 +91,20 @@ async function getInitialLength(): Promise<number> {
   }
 }
 
-// import { customAlphabet } from "nanoid";
-// import easyUrlModel from "../model/dbmodel";
+
 
 // Function to generate the initial length for the short ID based on the last entry
 // async function getInitialLength(): Promise<number> {
-//   try {
-//     const lastUrl = await easyUrlModel.findOne().sort({ _id: -1 }).exec(); // Latest entry
-//     return lastUrl ? lastUrl.shortId.toString().length : 4; // Default to 3 if no entries
-//   } catch (error) {
-//     console.error("Error fetching the last URL:", error);
-//     return 4; // Default to 3 if there's an error
-//   }
-// }
-
+  //   try {
+    //     const lastUrl = await easyUrlModel.findOne().sort({ _id: -1 }).exec(); // Latest entry
+    //     return lastUrl ? lastUrl.shortId.toString().length : 4; // Default to 3 if no entries
+    //   } catch (error) {
+      //     console.error("Error fetching the last URL:", error);
+      //     return 4; // Default to 3 if there's an error
+      //   }
+      // }
+      
+      // import { customAlphabet } from "nanoid";
 /**
  * Generates a unique short ID, increasing length only when collisions occur.
  * @returns {Promise<string>} - A unique short ID.
@@ -121,14 +121,7 @@ async function getInitialLength(): Promise<number> {
 //       const alphanumericNanoid = customAlphabet(alphabet, length); // Length of the ID
 //       shortId = alphanumericNanoid();
 //       console.log(`Checking for ID: ${shortId}`);
-//       const exists = await easyUrlModel.findOne({ shortId }).exec();
 //       return shortId; // Found a unique ID
-
-//       // if (!exists) {
-//       //   return shortId; // Found a unique ID
-//       // }
-//       // console.log(`Collision detected for ID: ${shortId}. Increasing length.`);
-//       // length++; // Increase length on collision
 //     }
 //   } catch (error) {
 //     console.error("Error generating unique ID:", error);

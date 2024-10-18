@@ -13,10 +13,6 @@ exports.setURLInCache = exports.getURLFromCache = void 0;
 const redisConfig_1 = require("../config/redisConfig");
 const getURLFromCache = (text) => __awaiter(void 0, void 0, void 0, function* () {
     let isRedisReady = (0, redisConfig_1.getRedisStatus)();
-    if (!isRedisReady) {
-        connectRedis();
-    }
-    isRedisReady = (0, redisConfig_1.getRedisStatus)();
     console.log("Redis connected:", isRedisReady);
     if (isRedisReady) {
         const value = yield redisConfig_1.redisClient.get(text);
@@ -30,10 +26,6 @@ const getURLFromCache = (text) => __awaiter(void 0, void 0, void 0, function* ()
 exports.getURLFromCache = getURLFromCache;
 const setURLInCache = (shortId, originalURL) => __awaiter(void 0, void 0, void 0, function* () {
     let isRedisReady = (0, redisConfig_1.getRedisStatus)();
-    if (!isRedisReady) {
-        connectRedis();
-    }
-    isRedisReady = (0, redisConfig_1.getRedisStatus)();
     if (isRedisReady) {
         yield redisConfig_1.redisClient.set(shortId, originalURL, {
             EX: 3600, // Set the expiration time to 3600 seconds
@@ -44,16 +36,3 @@ const setURLInCache = (shortId, originalURL) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.setURLInCache = setURLInCache;
-const connectRedis = () => __awaiter(void 0, void 0, void 0, function* () {
-    redisConfig_1.redisClient
-        .connect()
-        .then(() => {
-        (0, redisConfig_1.setRedisStatus)(true);
-        console.log("Connected to Redis:", (0, redisConfig_1.getRedisStatus)());
-    })
-        .catch((err) => {
-        (0, redisConfig_1.setRedisStatus)(false);
-        console.error("Redis connection error:", err);
-        //console.error("Redis connection error:", err);
-    });
-});
