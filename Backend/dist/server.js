@@ -22,6 +22,20 @@ redisConfig_1.redisClient
     console.error("Redis connection error:", err);
     //console.error("Redis connection error:", err);
 });
+redisConfig_1.redisClient.on('end', () => {
+    console.log('Redis connection closed. Attempting to reconnect...');
+    setTimeout(() => redisConfig_1.redisClient
+        .connect()
+        .then(() => {
+        (0, redisConfig_1.setRedisStatus)(true);
+        console.log("Connected to Redis:", (0, redisConfig_1.getRedisStatus)());
+    })
+        .catch((err) => {
+        (0, redisConfig_1.setRedisStatus)(false);
+        console.error("Redis connection error:", err);
+        //console.error("Redis connection error:", err);
+    }), 1000); // Reconnect after 1 second
+});
 const PORT = process.env.PORT || 5000;
 const app = (0, express_1.default)();
 //middleware to parse incoming JSON payloads and makes them available on req.body.
