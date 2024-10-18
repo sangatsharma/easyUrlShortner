@@ -1,8 +1,16 @@
-import { getRedisStatus ,redisClient} from "../config/redisConfig";
+import {
+  getRedisStatus,
+  setRedisStatus,
+  redisClient,
+} from "../config/redisConfig";
 
 export const getURLFromCache = async (text: string) => {
   let isRedisReady = getRedisStatus();
-  console.log("Check:", isRedisReady);
+  if (!isRedisReady) {
+    connectRedis();
+  }
+  isRedisReady = getRedisStatus();
+  console.log("Redis connected:", isRedisReady);
   if (isRedisReady) {
     const value = await redisClient.get(text);
     if (value) {
@@ -15,6 +23,10 @@ export const getURLFromCache = async (text: string) => {
 };
 export const setURLInCache = async (shortId: string, originalURL: string) => {
   let isRedisReady = getRedisStatus();
+  if (!isRedisReady) {
+    connectRedis();
+  }
+  isRedisReady = getRedisStatus();
   if (isRedisReady) {
     await redisClient.set(shortId, originalURL, {
       EX: 3600, // Set the expiration time to 3600 seconds
@@ -23,4 +35,18 @@ export const setURLInCache = async (shortId: string, originalURL: string) => {
       EX: 3600, // Set the expiration time to 3600 seconds
     });
   }
+};
+
+const connectRedis = async () => {
+  redisClient
+    .connect()
+    .then(() => {
+      setRedisStatus(true);
+      console.log("Connected to Redis:", getRedisStatus());
+    })
+    .catch((err) => {
+      setRedisStatus(false);
+      console.error("Redis connection error:", err);
+      //console.error("Redis connection error:", err);
+    });
 };
