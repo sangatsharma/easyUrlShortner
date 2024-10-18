@@ -14,14 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUrl = exports.getUrl = exports.getAllUrls = exports.createUrl = void 0;
 const generateUniqueId_1 = require("../utils/generateUniqueId");
-const dbmodel_1 = __importDefault(require("../model/dbmodel"));
+const db_model_1 = __importDefault(require("../model/db.model"));
 const redisConfig_1 = require("../config/redisConfig");
 const redisCache_1 = require("../utils/redisCache");
 const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { originalUrl } = req.body;
         if (!originalUrl) {
-            res.status(400).json({ error: "Invalid URL." });
+            res.status(400).json({ success: false, error: "Invalid URL." });
         }
         console.log("checking URL if exists in cache:");
         const cachedUrl = yield (0, redisCache_1.getURLFromCache)(originalUrl);
@@ -32,26 +32,26 @@ const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         console.log("URL dont  exists in cache, creating new URL:");
         const shortId = yield (0, generateUniqueId_1.generateUniqueId)();
-        const url = yield dbmodel_1.default.create({ originalUrl, shortId });
+        const url = yield db_model_1.default.create({ originalUrl, shortId });
         // Cache the new entry in Redis
         (0, redisCache_1.setURLInCache)(shortId, originalUrl);
         res.status(201).json({ success: true, url: url });
     }
     catch (error) {
         console.error("Error creating URL:", error);
-        res.status(500).json({ error: "Failed to create URL." });
+        res.status(500).json({ success: false, error: "Failed to create URL." });
     }
 });
 exports.createUrl = createUrl;
 const getAllUrls = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const urls = yield dbmodel_1.default.find().exec();
+        const urls = yield db_model_1.default.find().exec();
         res.status(200).json({ success: true, urls: urls });
     }
     catch (error) {
         res.send("URL not found");
         console.error("Error fetching URLs:", error);
-        res.status(500).json({ error: "Failed to fetch URLs." });
+        res.status(500).json({ sucess: false, error: "Failed to fetch URLs." });
     }
 });
 exports.getAllUrls = getAllUrls;
@@ -66,7 +66,7 @@ const getUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         console.log("URL dont  exists in cache, fetching from DB:");
-        const url = yield dbmodel_1.default.findOne({ shortId: req.params.id });
+        const url = yield db_model_1.default.findOne({ shortId: req.params.id });
         if (!url) {
             const referer = req.get("Referer") || "/";
             res.status(404).redirect(`${referer}404`);
@@ -84,11 +84,11 @@ const getUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getUrl = getUrl;
 const deleteUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield dbmodel_1.default
+        const result = yield db_model_1.default
             .deleteOne({ shortId: req.params.id })
             .exec();
         if (result.deletedCount === 0) {
-            res.status(404).json({ error: "URL not found." });
+            res.status(404).json({ success: false, error: "URL not found." });
             return;
         }
         // Remove the URL from Redis cache if it exists
@@ -99,7 +99,7 @@ const deleteUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.error("Error deleting URL:", error);
-        res.status(500).json({ error: "Failed to delete URL." });
+        res.status(500).json({ success: false, error: "Failed to delete URL." });
     }
 });
 exports.deleteUrl = deleteUrl;

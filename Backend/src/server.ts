@@ -2,8 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDb from "./config/dbConfig";
-import easyUrlRoutes from "./routes/easyUrl.routes";
-import userRoutes from "./routes/user.routes";
+import easyUrlRoutes from "./routes/easyUrlRoutes";
+import userRoutes from "./routes/userRoutes";
 import {
   getRedisStatus,
   redisClient,

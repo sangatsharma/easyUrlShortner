@@ -7,7 +7,7 @@ import {
   verificationHandler,
   validateUserHandler,
   forgotPasswordHandler,
-} from "../controllers/user.controller";
+} from "../controllers/userController";
 import { validateReferer } from "../middleware/validateReferer";
 
 const router = express.Router();
