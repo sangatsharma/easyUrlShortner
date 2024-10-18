@@ -22,8 +22,8 @@ redisConfig_1.redisClient
     console.error("Redis connection error:", err);
     //console.error("Redis connection error:", err);
 });
-redisConfig_1.redisClient.on('end', () => {
-    console.log('Redis connection closed. Attempting to reconnect...');
+redisConfig_1.redisClient.on("end", () => {
+    console.log("Redis connection closed. Attempting to reconnect...");
     setTimeout(() => redisConfig_1.redisClient
         .connect()
         .then(() => {
