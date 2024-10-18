@@ -7,8 +7,8 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const dbConfig_1 = __importDefault(require("./config/dbConfig"));
-const easyUrlRoutes_1 = __importDefault(require("./routes/easyUrlRoutes"));
-const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
+const easyUrl_routes_1 = __importDefault(require("./routes/easyUrl.routes"));
+const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const redisConfig_1 = require("./config/redisConfig");
 dotenv_1.default.config();
 (0, dbConfig_1.default)();
@@ -51,8 +51,8 @@ app.use((0, cors_1.default)({
     ],
     credentials: true,
 }));
-app.use("/", easyUrlRoutes_1.default);
-app.use("/user", userRoutes_1.default);
+app.use("/", easyUrl_routes_1.default);
+app.use("/user", user_routes_1.default);
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
