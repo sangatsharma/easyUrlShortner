@@ -3,6 +3,7 @@ import UrlShortener from "../Components/UrlShortener";
 import CTASection from "../Components/CTASection";
 import FeaturesSection from "../Components/FeaturesSection";
 
+
 interface IHomepageProps {}
 
 const Homepage: React.FunctionComponent<IHomepageProps> = () => {
@@ -12,6 +13,7 @@ const Homepage: React.FunctionComponent<IHomepageProps> = () => {
         <UrlShortener />
         <CTASection />
         <FeaturesSection />
+  
       </main>
     </div>
   );

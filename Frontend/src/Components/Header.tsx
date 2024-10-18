@@ -13,22 +13,18 @@ const Header: React.FC = () => {
         <nav aria-label="Primary Navigation">
           <ul className="flex space-x-4">
             <li>
-              <a
-                href="/"
-                className="text-sm hover:underline"
-                aria-current="page"
-              >
-                Home
+              <a href="/login" className="text-sm hover:underline">
+                Login
+              </a>
+            </li>
+            <li>
+              <a href="/signup" className="text-sm hover:underline">
+                Signup
               </a>
             </li>
             <li>
               <a href="/about" className="text-sm hover:underline">
                 About Us
-              </a>
-            </li>
-            <li>
-              <a href="/contact" className="text-sm hover:underline">
-                Contact
               </a>
             </li>
           </ul>

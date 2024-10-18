@@ -4,7 +4,8 @@ import { Request, Response, NextFunction } from "express";
 const allowedDomains = [
   "https://www.easyurl.me",
   "https://easyurl.me",
-  "http://localhost:5173",// Local development
+  "http://localhost:5173",
+  ""// Local development
 ];
 
 /**

@@ -2,7 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDb from "./config/dbConfig";
-import easyUrlRoutes from "./routes/easyUrlroutes";
+import easyUrlRoutes from "./routes/easyUrl.routes";
+import userRoutes from "./routes/user.routes";
 import {
   getRedisStatus,
   redisClient,
@@ -60,6 +61,7 @@ app.use(
   })
 );
 app.use("/", easyUrlRoutes);
+app.use("/user", userRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

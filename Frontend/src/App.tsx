@@ -4,6 +4,9 @@ import Homepage from "./Pages/Homepage";
 import PageNotFound from "./Pages/PageNotFound";
 import RedirectPage from "./Pages/RedirectPage";
 import RootPageLayout from "./Pages/RootPageLayout";
+import LoginForm from "./Pages/LoginForm";
+import SignupForm from "./Pages/SignupForm";
+import ForgotPassword from "./Pages/ForgotPassword";
 
 interface IAppProps {}
 
@@ -16,6 +19,9 @@ const App: React.FunctionComponent<IAppProps> = () => {
       children: [
         { path: ":id", element: <RedirectPage /> },
         { path: "/", element: <Homepage /> },
+        { path: "/login", element: <LoginForm /> },
+        { path: "/signup", element: <SignupForm/> },
+        { path: "/forgot-password", element: <ForgotPassword/> },
         {
           path: "/404",
           element: (

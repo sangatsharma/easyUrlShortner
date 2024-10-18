@@ -1,6 +1,6 @@
 import express from "express";
 import { generateUniqueId } from "../utils/generateUniqueId";
-import easyUrlModel from "../model/dbmodel";
+import easyUrlModel from "../model/db.model";
 import { redisClient } from "../config/redisConfig";
 import { getURLFromCache, setURLInCache } from "../utils/redisCache";
 
@@ -13,7 +13,7 @@ export const createUrl = async (
   try {
     const { originalUrl } = req.body;
     if (!originalUrl) {
-      res.status(400).json({ error: "Invalid URL." });
+      res.status(400).json({success:false, error: "Invalid URL." });
     }
     console.log("checking URL if exists in cache:");
     const cachedUrl = await getURLFromCache(originalUrl);
@@ -25,13 +25,14 @@ export const createUrl = async (
     console.log("URL dont  exists in cache, creating new URL:");
     const shortId = await generateUniqueId();
     const url = await easyUrlModel.create({ originalUrl, shortId });
+      
 
     // Cache the new entry in Redis
     setURLInCache(shortId, originalUrl);
     res.status(201).json({ success: true, url: url });
   } catch (error) {
     console.error("Error creating URL:", error);
-    res.status(500).json({ error: "Failed to create URL." });
+    res.status(500).json({ success:false,error: "Failed to create URL." });
   }
 };
 
@@ -45,7 +46,7 @@ export const getAllUrls = async (
   } catch (error) {
     res.send("URL not found");
     console.error("Error fetching URLs:", error);
-    res.status(500).json({ error: "Failed to fetch URLs." });
+    res.status(500).json({sucess:false, error: "Failed to fetch URLs." });
   }
 };
 
@@ -88,7 +89,7 @@ export const deleteUrl = async (
       .deleteOne({ shortId: req.params.id })
       .exec();
     if (result.deletedCount === 0) {
-      res.status(404).json({ error: "URL not found." });
+      res.status(404).json({success:false, error: "URL not found." });
       return;
     }
     // Remove the URL from Redis cache if it exists
@@ -98,6 +99,6 @@ export const deleteUrl = async (
     res.status(200).json({ success: true, message: "Successfully deleted." });
   } catch (error) {
     console.error("Error deleting URL:", error);
-    res.status(500).json({ error: "Failed to delete URL." });
+    res.status(500).json({success:false, error: "Failed to delete URL." });
   }
 };
