@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {  useRef, useEffect } from "react";
 import QRCode from "qrcode";
 
-const QRCodeGenerator: React.FC<{ url: string }> = (props) => {
-  const [qrImageUrl, setQrImageUrl] = useState(""); // Store the QR code image URL
+const QRCodeGenerator: React.FC<{ url: string ,qrImageUrl:string,setQrImageUrl:(text:string)=>void,}> = (props) => {
+
   const canvasRef = useRef(null); // Reference to the canvas element
 
   useEffect(() => {
@@ -13,20 +13,13 @@ const QRCodeGenerator: React.FC<{ url: string }> = (props) => {
   const generateQrCode = async () => {
     try {
       const url = await QRCode.toDataURL(props.url);
-      setQrImageUrl(url); // Store QR code data URL
+      props.setQrImageUrl(url); // Store QR code data URL
     } catch (error) {
       console.error("Error generating QR code:", error);
     }
   };
 
-  // Download the QR code image
-  const downloadQrCode = () => {
-    const link = document.createElement("a");
-    link.href = qrImageUrl;
-    link.download = "qrcode.png"; // Download as PNG file
-    link.click();
-  };
-
+  
   return (
     <div className="flex flex-col items-center space-y-4 ">
       {/*      
@@ -44,20 +37,15 @@ const QRCodeGenerator: React.FC<{ url: string }> = (props) => {
         Generate QR Code
       </button> */}
 
-      {qrImageUrl && (
+      {props.qrImageUrl && (
         <>
           <img
-            src={qrImageUrl}
+            src={props.qrImageUrl}
             alt="Generated QR Code"
             ref={canvasRef}
-            className="mt-4 border p-2"
+            className=" border"
           />
-          <button
-            onClick={downloadQrCode}
-            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-          >
-            Download QR Code
-          </button>
+          
         </>
       )}
     </div>

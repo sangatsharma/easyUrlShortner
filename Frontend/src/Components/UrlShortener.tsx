@@ -40,7 +40,10 @@ const UrlShortener: React.FC = () => {
         { originalUrl: formattedUrl }
       );
       setShortLink(`easyurl.me/${response.data.url.shortId}`);
-      setAllLinks([...allLinks,`https://easyurl.me/${response.data.url.shortId}`]);
+      setAllLinks([
+        ...allLinks,
+        `https://easyurl.me/${response.data.url.shortId}`,
+      ]);
     } catch (err) {
       setError("Failed to shorten the URL. Please try again.");
     } finally {
@@ -49,7 +52,7 @@ const UrlShortener: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-6xl mx-auto mt-4">
+    <div className="bg-white p-8 rounded-lg shadow-lg w-full mx-auto mt-4">
       <h2 className="text-2xl font-semibold text-center mb-4">
         Shorten Your URL
       </h2>
