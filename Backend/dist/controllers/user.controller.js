@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verificationHandler = exports.forgotPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.signupHandler = void 0;
+exports.resendOtpHandler = exports.verificationHandler = exports.forgotPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.signupHandler = void 0;
 const user_model_1 = __importDefault(require("../model/user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generateVerificationToken_1 = require("../utils/generateVerificationToken");
@@ -30,7 +30,22 @@ const signupHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const user = yield user_model_1.default.findOne({ email });
         if (user) {
-            res.status(400).json({ success: false, message: "User already exists" });
+            if (user.isEmailVerified)
+                res
+                    .status(200)
+                    .json({ success: false, message: "User already exists" });
+            else {
+                const otp = (0, generateVerificationToken_1.generateVerificationToken)();
+                user.password = yield bcryptjs_1.default.hash(password, 10);
+                user.name = name;
+                user.emailVerificationToken = otp;
+                user.emailVerificationTokenExpiry = new Date(new Date().getTime() + 10 * 60 * 1000);
+                yield user.save();
+                (0, sendVerificationEmail_1.sendOtpEmail)(email, otp, name);
+                res
+                    .status(200)
+                    .json({ success: true, message: "Email is not verified." });
+            }
             return;
         }
         // Hash the password
@@ -43,19 +58,10 @@ const signupHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             emailVerificationToken,
             emailVerificationTokenExpiry: new Date(new Date().getTime() + 10 * 60 * 1000),
         });
-        //todo send email verification email
-        //jwt token
-        (0, generateAndSetCookie_1.generateAndSetCookie)(res, newUser._id);
         (0, sendVerificationEmail_1.sendOtpEmail)(email, emailVerificationToken, name);
-        res.status(201).json({
+        res.status(200).json({
             success: true,
-            message: "User created successfully",
-            user: {
-                email: newUser.email,
-                name: newUser.name,
-                role: newUser.role,
-                isEmailVerified: newUser.isEmailVerified,
-            },
+            message: "Please verify your email.",
         });
     }
     catch (error) {
@@ -68,20 +74,34 @@ const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     const { email, password } = req.body;
     if (!email || !password) {
         res
-            .status(400)
+            .status(200)
             .json({ success: false, message: "Email and password are required" });
         return;
     }
     try {
         const user = yield user_model_1.default.findOne({ email });
         if (!user) {
-            res.status(404).json({ success: false, message: "User not found" });
+            res.status(200).json({ success: false, message: "Invalid credentials!" });
             return;
         }
-        if (user.password !== password) {
-            res.status(401).json({ success: false, message: "Invalid password!" });
+        const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
+        if (!isPasswordValid) {
+            res.status(200).json({ success: false, message: "Invalid credentials!" });
             return;
         }
+        if (!user.isEmailVerified) {
+            const otp = (0, generateVerificationToken_1.generateVerificationToken)();
+            user.emailVerificationToken = otp;
+            user.emailVerificationTokenExpiry = new Date(new Date().getTime() + 10 * 60 * 1000);
+            yield user.save();
+            (0, sendVerificationEmail_1.sendOtpEmail)(email, otp, user.name);
+            res
+                .status(200)
+                .json({ success: false, message: "Email is not verified." });
+            return;
+        }
+        //jwt token
+        (0, generateAndSetCookie_1.generateAndSetCookie)(res, user._id);
         res
             .status(200)
             .json({ success: true, message: "User logged in successfully." });
@@ -155,11 +175,11 @@ const verificationHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         }
         // Check if OTP matches and is still valid
         if (user.emailVerificationToken !== otp) {
-            res.status(400).json({ message: "Invalid OTP." });
+            res.status(200).json({ message: "Invalid OTP." });
             return;
         }
         if (user.emailVerificationTokenExpiry < new Date()) {
-            res.status(400).json({ message: "OTP has expired." });
+            res.status(200).json({ message: "OTP has expired." });
             return;
         }
         // Update user's email verification status
@@ -167,15 +187,52 @@ const verificationHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         user.emailVerificationToken = null; // Clear the OTP
         user.emailVerificationTokenExpiry = null; // Clear the expiry
         yield user.save();
-        res.status(200).json({ message: "Email verified successfully." });
+        (0, generateAndSetCookie_1.generateAndSetCookie)(res, user._id);
+        res.status(200).json({
+            success: true,
+            message: "User created successfully",
+            user: {
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                isEmailVerified: user.isEmailVerified,
+            },
+        });
         return;
     }
     catch (error) {
         console.error("Error verifying OTP:", error);
-        res
-            .status(500)
-            .json({ message: "Internal Server Error", error: error });
+        res.status(500).json({ message: "Internal Server Error", error: error });
         return;
     }
 });
 exports.verificationHandler = verificationHandler;
+const resendOtpHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email } = req.body;
+    if (!email) {
+        res.status(200).json({ success: false, message: "Email is required" });
+        return;
+    }
+    try {
+        const user = yield user_model_1.default.findOne({ email });
+        if (!user) {
+            res.status(200).json({ success: false, message: "User not found" });
+            return;
+        }
+        const otp = (0, generateVerificationToken_1.generateVerificationToken)();
+        user.emailVerificationToken = otp;
+        user.emailVerificationTokenExpiry = new Date(new Date().getTime() + 10 * 60 * 1000);
+        yield user.save();
+        (0, sendVerificationEmail_1.sendOtpEmail)(email, otp, user.name);
+        res.status(200).json({
+            success: true,
+            message: "OTP sent successfully",
+        });
+        console.log("OTP sent successfully:", email, otp);
+        return;
+    }
+    catch (error) {
+        console.log("Error in resending OTP: ", error);
+    }
+});
+exports.resendOtpHandler = resendOtpHandler;

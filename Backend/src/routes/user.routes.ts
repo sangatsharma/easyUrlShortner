@@ -7,6 +7,7 @@ import {
   verificationHandler,
   validateUserHandler,
   forgotPasswordHandler,
+  resendOtpHandler,
 } from "../controllers/user.controller";
 import { validateReferer } from "../middleware/validateReferer";
 
@@ -21,5 +22,6 @@ router.post("/signup", validateReferer, signupHandler);
 router.delete("/auth/deactivate", validateReferer, deactivateHandler);
 router.post("/verify/", validateReferer, verificationHandler);
 router.get("/validate", validateReferer, validateUserHandler);
+router.post("/resendOtp", validateReferer, resendOtpHandler);
 router.post("/auth/forgot-password", validateReferer, forgotPasswordHandler);
 export default router;

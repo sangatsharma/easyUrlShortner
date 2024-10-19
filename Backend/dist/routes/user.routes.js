@@ -16,5 +16,6 @@ router.post("/signup", validateReferer_1.validateReferer, user_controller_1.sign
 router.delete("/auth/deactivate", validateReferer_1.validateReferer, user_controller_1.deactivateHandler);
 router.post("/verify/", validateReferer_1.validateReferer, user_controller_1.verificationHandler);
 router.get("/validate", validateReferer_1.validateReferer, user_controller_1.validateUserHandler);
+router.post("/resendOtp", validateReferer_1.validateReferer, user_controller_1.resendOtpHandler);
 router.post("/auth/forgot-password", validateReferer_1.validateReferer, user_controller_1.forgotPasswordHandler);
 exports.default = router;

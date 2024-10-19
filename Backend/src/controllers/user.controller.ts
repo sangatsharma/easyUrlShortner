@@ -20,7 +20,24 @@ export const signupHandler = async (
   try {
     const user = await userModel.findOne({ email });
     if (user) {
-      res.status(400).json({ success: false, message: "User already exists" });
+      if (user.isEmailVerified)
+        res
+          .status(200)
+          .json({ success: false, message: "User already exists" });
+      else {
+        const otp = generateVerificationToken();
+        user.password = await bcryptjs.hash(password, 10);
+        user.name = name;
+        user.emailVerificationToken = otp;
+        user.emailVerificationTokenExpiry = new Date(
+          new Date().getTime() + 10 * 60 * 1000
+        );
+        await user.save();
+        sendOtpEmail(email, otp, name);
+        res
+          .status(200)
+          .json({ success: true, message: "Email is not verified." });
+      }
       return;
     }
     // Hash the password
@@ -35,20 +52,10 @@ export const signupHandler = async (
         new Date().getTime() + 10 * 60 * 1000
       ),
     });
-    //todo send email verification email
-    //jwt token
-    generateAndSetCookie(res, newUser._id as string);
     sendOtpEmail(email, emailVerificationToken, name);
-
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "User created successfully",
-      user: {
-        email: newUser.email,
-        name: newUser.name,
-        role: newUser.role,
-        isEmailVerified: newUser.isEmailVerified,
-      },
+      message: "Please verify your email.",
     });
   } catch (error) {
     console.log("Error in creating user: ", error);
@@ -63,20 +70,36 @@ export const loginHandler = async (
   const { email, password } = req.body;
   if (!email || !password) {
     res
-      .status(400)
+      .status(200)
       .json({ success: false, message: "Email and password are required" });
     return;
   }
   try {
     const user = await userModel.findOne({ email });
     if (!user) {
-      res.status(404).json({ success: false, message: "User not found" });
+      res.status(200).json({ success: false, message: "Invalid credentials!" });
       return;
     }
-    if (user.password !== password) {
-      res.status(401).json({ success: false, message: "Invalid password!" });
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+      res.status(200).json({ success: false, message: "Invalid credentials!" });
       return;
     }
+    if (!user.isEmailVerified) {
+      const otp = generateVerificationToken();
+      user.emailVerificationToken = otp;
+      user.emailVerificationTokenExpiry = new Date(
+        new Date().getTime() + 10 * 60 * 1000
+      );
+      await user.save();
+      sendOtpEmail(email, otp, user.name);
+      res
+        .status(200)
+        .json({ success: false, message: "Email is not verified." });
+      return;
+    }
+    //jwt token
+    generateAndSetCookie(res, user._id as string);
     res
       .status(200)
       .json({ success: true, message: "User logged in successfully." });
@@ -129,7 +152,7 @@ export const forgotPasswordHandler = async (
       email,
     });
     if (!user) {
-      res.status(404).json({ success: false, message: "User not found" });
+      res.status(200).json({ success: false, message: "User not found" });
       return;
     }
     // todo implement forgot password
@@ -143,13 +166,16 @@ export const forgotPasswordHandler = async (
   }
 };
 
-export const verificationHandler = async (req: Request, res: Response):Promise<void> => {
+export const verificationHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { email, otp } = req.body;
 
   // Validate input
   if (!email || !otp) {
-     res.status(400).json({ message: "Email and OTP are required." });
-     return;
+    res.status(400).json({ message: "Email and OTP are required." });
+    return;
   }
 
   try {
@@ -163,13 +189,13 @@ export const verificationHandler = async (req: Request, res: Response):Promise<v
 
     // Check if OTP matches and is still valid
     if (user.emailVerificationToken !== otp) {
-       res.status(400).json({ message: "Invalid OTP." });
-       return;
+      res.status(200).json({ message: "Invalid OTP." });
+      return;
     }
 
     if ((user.emailVerificationTokenExpiry as Date) < new Date()) {
-       res.status(400).json({ message: "OTP has expired." });
-       return;
+      res.status(200).json({ message: "OTP has expired." });
+      return;
     }
 
     // Update user's email verification status
@@ -177,14 +203,54 @@ export const verificationHandler = async (req: Request, res: Response):Promise<v
     user.emailVerificationToken = null; // Clear the OTP
     user.emailVerificationTokenExpiry = null; // Clear the expiry
     await user.save();
-
-     res.status(200).json({ message: "Email verified successfully." });
-     return;
+    generateAndSetCookie(res, user._id as string);
+    res.status(200).json({
+      success: true,
+      message: "User created successfully",
+      user: {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        isEmailVerified: user.isEmailVerified,
+      },
+    });
+    return;
   } catch (error) {
     console.error("Error verifying OTP:", error);
-     res
-      .status(500)
-      .json({ message: "Internal Server Error", error: error });
+    res.status(500).json({ message: "Internal Server Error", error: error });
+    return;
+  }
+};
+
+export const resendOtpHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(200).json({ success: false, message: "Email is required" });
+    return;
+  }
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      res.status(200).json({ success: false, message: "User not found" });
       return;
+    }
+    const otp = generateVerificationToken();
+    user.emailVerificationToken = otp;
+    user.emailVerificationTokenExpiry = new Date(
+      new Date().getTime() + 10 * 60 * 1000
+    );
+    await user.save();
+    sendOtpEmail(email, otp, user.name);
+    res.status(200).json({
+      success: true,
+      message: "OTP sent successfully",
+    });
+    console.log("OTP sent successfully:",email, otp);
+    return;
+  } catch (error) {
+    console.log("Error in resending OTP: ", error);
   }
 };
