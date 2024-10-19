@@ -157,7 +157,7 @@ const LoginForm: React.FC = () => {
               type="submit"
               className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200"
             >
-              Log In
+             {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
           {error && <p className="text-red-500 mt-4">{error}</p>}
