@@ -99,7 +99,15 @@ export const loginHandler = async (
       return;
     }
     //jwt token
-    generateAndSetCookie(res, user._id as string);
+    generateAndSetCookie(
+      res,
+      user as {
+        _id: string;
+        email: string;
+        role: string;
+        name: string;
+      }
+    );
     res
       .status(200)
       .json({ success: true, message: "User logged in successfully." });
@@ -133,18 +141,26 @@ export const validateUserHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  // todo implement validate user
+  const user = res.locals.user;
+  if (!user) {
+    res.status(400).json({ success: false, message: "User is required" });
+    return;
+  }
   res
     .status(200)
-    .json({ success: true, message: "User validated successfully." });
+    .json({ success: true, message: "User validated successfully.", user });
+  return;
 };
-export const forgotPasswordHandler = async (
+
+export const resetPasswordHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { email } = req.body;
-  if (!email) {
-    res.status(400).json({ success: false, message: "Email is required" });
+  const { email, password } = req.body;
+  if (!email || !password) {
+    res
+      .status(400)
+      .json({ success: false, message: "Email and Password is required" });
     return;
   }
   try {
@@ -155,10 +171,12 @@ export const forgotPasswordHandler = async (
       res.status(200).json({ success: false, message: "User not found" });
       return;
     }
-    // todo implement forgot password
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    user.password = hashedPassword;
+    await user.save();
     res.status(200).json({
       success: true,
-      message: "Password reset link sent to your email.",
+      message: "Password reset successfully",
     });
   } catch (error) {
     console.log("Error in forgot password: ", error);
@@ -203,10 +221,18 @@ export const verificationHandler = async (
     user.emailVerificationToken = null; // Clear the OTP
     user.emailVerificationTokenExpiry = null; // Clear the expiry
     await user.save();
-    generateAndSetCookie(res, user._id as string);
+    generateAndSetCookie(
+      res,
+      user as {
+        _id: string;
+        email: string;
+        role: string;
+        name: string;
+      }
+    );
     res.status(200).json({
       success: true,
-      message: "User created successfully",
+      message: "OTP verified successfully",
       user: {
         email: user.email,
         name: user.name,
@@ -248,9 +274,41 @@ export const resendOtpHandler = async (
       success: true,
       message: "OTP sent successfully",
     });
-    console.log("OTP sent successfully:",email, otp);
+    console.log("OTP sent successfully:", email, otp);
     return;
   } catch (error) {
     console.log("Error in resending OTP: ", error);
+  }
+};
+
+export const findUserHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(200).json({ success: false, message: "Email is required" });
+    return;
+  }
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      res.status(200).json({ success: false, message: "User not found" });
+      return;
+    }
+    const otp = generateVerificationToken();
+    user.emailVerificationToken = otp;
+    user.emailVerificationTokenExpiry = new Date(
+      new Date().getTime() + 10 * 60 * 1000
+    );
+    await user.save();
+    sendOtpEmail(email, otp, user.name);
+    res.status(200).json({
+      success: true,
+      message: "OTP sent successfully",
+    });
+  } catch (error) {
+    console.log("Error in finding user: ", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

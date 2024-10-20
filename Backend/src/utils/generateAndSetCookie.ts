@@ -3,8 +3,14 @@ import { Response } from "express";
 import dotenv from "dotenv";
 dotenv.config();
 
-export const generateAndSetCookie = (res: Response, userId: string) => {
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET as string, {
+export const generateAndSetCookie = (res: Response, user: {
+  _id: string;
+  email: string;
+  role: string;
+  name: string;
+}) => {
+
+  const token = jwt.sign({ _id:user._id, email:user.email,role:user.role,name:user.name }, process.env.JWT_SECRET as string, {
     expiresIn: "7d",
   });
   res.cookie("token", token, {

@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import connectDb from "./config/dbConfig";
 import easyUrlRoutes from "./routes/easyurl.routes";
 import userRoutes from "./routes/user.routes";
@@ -48,6 +49,7 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 //middleware to parse incoming JSON payloads and makes them available on req.body.
 app.use(express.json());
+app.use(cookieParser());
 //handles URL-encoded data
 app.use(express.urlencoded({ extended: true }));
 app.use(

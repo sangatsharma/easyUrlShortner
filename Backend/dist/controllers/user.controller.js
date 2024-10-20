@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resendOtpHandler = exports.verificationHandler = exports.forgotPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.signupHandler = void 0;
+exports.findUserHandler = exports.resendOtpHandler = exports.verificationHandler = exports.resetPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.signupHandler = void 0;
 const user_model_1 = __importDefault(require("../model/user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generateVerificationToken_1 = require("../utils/generateVerificationToken");
@@ -101,7 +101,7 @@ const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return;
         }
         //jwt token
-        (0, generateAndSetCookie_1.generateAndSetCookie)(res, user._id);
+        (0, generateAndSetCookie_1.generateAndSetCookie)(res, user);
         res
             .status(200)
             .json({ success: true, message: "User logged in successfully." });
@@ -127,16 +127,23 @@ const deactivateHandler = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.deactivateHandler = deactivateHandler;
 const validateUserHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // todo implement validate user
+    const user = res.locals.user;
+    if (!user) {
+        res.status(400).json({ success: false, message: "User is required" });
+        return;
+    }
     res
         .status(200)
-        .json({ success: true, message: "User validated successfully." });
+        .json({ success: true, message: "User validated successfully.", user });
+    return;
 });
 exports.validateUserHandler = validateUserHandler;
-const forgotPasswordHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.body;
-    if (!email) {
-        res.status(400).json({ success: false, message: "Email is required" });
+const resetPasswordHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        res
+            .status(400)
+            .json({ success: false, message: "Email and Password is required" });
         return;
     }
     try {
@@ -144,13 +151,15 @@ const forgotPasswordHandler = (req, res) => __awaiter(void 0, void 0, void 0, fu
             email,
         });
         if (!user) {
-            res.status(404).json({ success: false, message: "User not found" });
+            res.status(200).json({ success: false, message: "User not found" });
             return;
         }
-        // todo implement forgot password
+        const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
+        user.password = hashedPassword;
+        yield user.save();
         res.status(200).json({
             success: true,
-            message: "Password reset link sent to your email.",
+            message: "Password reset successfully",
         });
     }
     catch (error) {
@@ -158,7 +167,7 @@ const forgotPasswordHandler = (req, res) => __awaiter(void 0, void 0, void 0, fu
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 });
-exports.forgotPasswordHandler = forgotPasswordHandler;
+exports.resetPasswordHandler = resetPasswordHandler;
 const verificationHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, otp } = req.body;
     // Validate input
@@ -187,10 +196,10 @@ const verificationHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         user.emailVerificationToken = null; // Clear the OTP
         user.emailVerificationTokenExpiry = null; // Clear the expiry
         yield user.save();
-        (0, generateAndSetCookie_1.generateAndSetCookie)(res, user._id);
+        (0, generateAndSetCookie_1.generateAndSetCookie)(res, user);
         res.status(200).json({
             success: true,
-            message: "User created successfully",
+            message: "OTP verified successfully",
             user: {
                 email: user.email,
                 name: user.name,
@@ -236,3 +245,31 @@ const resendOtpHandler = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.resendOtpHandler = resendOtpHandler;
+const findUserHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email } = req.body;
+    if (!email) {
+        res.status(200).json({ success: false, message: "Email is required" });
+        return;
+    }
+    try {
+        const user = yield user_model_1.default.findOne({ email });
+        if (!user) {
+            res.status(200).json({ success: false, message: "User not found" });
+            return;
+        }
+        const otp = (0, generateVerificationToken_1.generateVerificationToken)();
+        user.emailVerificationToken = otp;
+        user.emailVerificationTokenExpiry = new Date(new Date().getTime() + 10 * 60 * 1000);
+        yield user.save();
+        (0, sendVerificationEmail_1.sendOtpEmail)(email, otp, user.name);
+        res.status(200).json({
+            success: true,
+            message: "OTP sent successfully",
+        });
+    }
+    catch (error) {
+        console.log("Error in finding user: ", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+exports.findUserHandler = findUserHandler;

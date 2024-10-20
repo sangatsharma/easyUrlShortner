@@ -5,7 +5,7 @@ const allowedDomains = [
   "https://www.easyurl.me",
   "https://easyurl.me",
   "http://localhost:5173",
-// Local development
+  // Local development
 ];
 
 /**
@@ -17,7 +17,7 @@ export const validateReferer = (
   next: NextFunction
 ): void => {
   // Get the Referer header
-  const referer = req.get("Referer") || ""; 
+  const referer = req.get("Referer") || "";
   console.log("Referer:", referer);
 
   // Check if the Referer starts with any of the allowed domains

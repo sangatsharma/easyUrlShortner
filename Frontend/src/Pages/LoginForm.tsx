@@ -197,7 +197,7 @@ const LoginForm: React.FC = () => {
             onClick={handleOtpVerification}
             className="bg-blue-500 mt-4 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200"
           >
-            Verify OTP
+           {loading ? "Verifying..." : "Verify OTP"}
           </button>
         </div>
       )}

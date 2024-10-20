@@ -7,8 +7,8 @@ exports.generateAndSetCookie = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const generateAndSetCookie = (res, userId) => {
-    const token = jsonwebtoken_1.default.sign({ userId }, process.env.JWT_SECRET, {
+const generateAndSetCookie = (res, user) => {
+    const token = jsonwebtoken_1.default.sign({ _id: user._id, email: user.email, role: user.role, name: user.name }, process.env.JWT_SECRET, {
         expiresIn: "7d",
     });
     res.cookie("token", token, {
