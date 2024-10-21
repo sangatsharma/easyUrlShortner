@@ -15,7 +15,6 @@ export const sendOtpEmail = async (
       pass: process.env.EMAIL_PASSWORD as string,
     },
   });
-console.log("email",process.env.EMAIL, process.env.EMAIL_PASSWORD);
   const mailOptions = {
     from: process.env.EMAIL as string,
     to: email,
