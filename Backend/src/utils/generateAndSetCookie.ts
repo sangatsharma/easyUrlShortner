@@ -15,10 +15,12 @@ export const generateAndSetCookie = (res: Response, user: {
   });
   res.cookie("token", token, {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    secure: process.env.NODE_ENV === "PROD",
+    secure: (process.env.NODE_ENV as string) === "PROD",
     httpOnly: true,
     // sameSite: "strict",
     sameSite: "lax",
+    path: "/",
+    domain:".me",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
