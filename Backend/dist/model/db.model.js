@@ -27,12 +27,10 @@ const urlSchema = new mongoose_1.default.Schema({
         required: true,
         default: Date.now,
     },
+    userId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: false },
     expiryDate: {
         type: Date,
         required: true,
-        default: function () {
-            return new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 7 days from now
-        },
         index: { expireAfterSeconds: 0 }, // TTL index for automatic deletion
     },
 });

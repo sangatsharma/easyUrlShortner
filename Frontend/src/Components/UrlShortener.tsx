@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import axios from "axios";
 import ShortLinkDisplay from "./ShortLinkDisplay";
 import { isValidUrl } from "../utils/validUrlChecker.ts";
-import UrlTable from "./URLtable.tsx";
+
 
 const UrlShortener: React.FC = () => {
   const [url, setUrl] = useState<string>("");
@@ -37,8 +37,9 @@ const UrlShortener: React.FC = () => {
 
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/api/shortUrl`,
-        { originalUrl: formattedUrl }
+        { originalUrl: formattedUrl },{withCredentials: true}
       );
+      console.log(response.data);
       setShortLink(`easyurl.me/${response.data.url.shortId}`);
       setAllLinks([
         ...allLinks,
@@ -52,7 +53,7 @@ const UrlShortener: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg w-full mx-auto mt-4">
+    <div className="bg-white p-8 rounded-lg shadow-lg mx-auto sm:mx-12 md:mx-20 lg:mx-32 xl:mx-40 mt-2">
       <h2 className="text-2xl font-semibold text-center mb-4">
         Shorten Your URL
       </h2>
@@ -92,14 +93,6 @@ const UrlShortener: React.FC = () => {
         </p>
       )}
       {shortLink && <ShortLinkDisplay shortLink={shortLink} />}
-      {/* <div className="mt-8">
-        <ul className="mt-4 space-y-2">
-          {allLinks.map((link,index) => (
-            <QRCodeGenerator key={index} url={link} />
-          ))}
-        </ul>
-      </div> */}
-      <UrlTable links={[]} />
     </div>
   );
 };

@@ -17,6 +17,7 @@ const generateUniqueId_1 = require("../utils/generateUniqueId");
 const db_model_1 = __importDefault(require("../model/db.model"));
 const redisConfig_1 = require("../config/redisConfig");
 const redisCache_1 = require("../utils/redisCache");
+//handler to create short url from long url
 const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { originalUrl } = req.body;
@@ -30,12 +31,23 @@ const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res.status(200).json({ success: true, url: { shortId: cachedUrl } });
             return;
         }
+        let expiryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); //3 days from now
+        console.log("User:", res.locals.user);
+        const userId = res.locals.user ? res.locals.user._id : null;
+        if (userId) {
+            expiryDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+        }
         console.log("URL dont  exists in cache, creating new URL:");
         const shortId = yield (0, generateUniqueId_1.generateUniqueId)();
-        const url = yield db_model_1.default.create({ originalUrl, shortId });
+        const url = yield db_model_1.default.create({
+            originalUrl,
+            shortId,
+            userId,
+            expiryDate: expiryDate,
+        });
         // Cache the new entry in Redis
         (0, redisCache_1.setURLInCache)(shortId, originalUrl);
-        res.status(201).json({ success: true, url: url });
+        res.status(201).json({ success: true, url: url, userId: userId });
     }
     catch (error) {
         console.error("Error creating URL:", error);
@@ -43,10 +55,18 @@ const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.createUrl = createUrl;
+//handler to get all urls
 const getAllUrls = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = res.locals.user ? res.locals.user._id : null;
+    if (!userId) {
+        res.status(400).json({ success: false, error: "User not found." });
+        return;
+    }
     try {
-        const urls = yield db_model_1.default.find().exec();
+        const urls = yield db_model_1.default.find({ userId: userId }).exec();
+        console.log("URLs:", urls);
         res.status(200).json({ success: true, urls: urls });
+        return;
     }
     catch (error) {
         res.send("URL not found");

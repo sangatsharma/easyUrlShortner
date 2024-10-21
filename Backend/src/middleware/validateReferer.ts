@@ -5,6 +5,7 @@ const allowedDomains = [
   "https://www.easyurl.me",
   "https://easyurl.me",
   "http://localhost:5173",
+  "",
   // Local development
 ];
 
@@ -31,7 +32,6 @@ export const validateReferer = (
     res.status(403).json({ error: "Unauthorized access" }); // Send a 403 response
     return; // Stop further processing
   }
-
   // If valid, proceed to the next middleware or route handler
   next();
 };

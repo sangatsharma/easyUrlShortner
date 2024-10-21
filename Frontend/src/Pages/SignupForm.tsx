@@ -28,6 +28,8 @@ const SignupForm: React.FC = () => {
         {
           email: formik.values.email as string,
           otp: otp as string,
+          password: formik.values.password as string,
+          name: formik.values.name as string,
         },
         {
           withCredentials: true,
@@ -76,9 +78,7 @@ const SignupForm: React.FC = () => {
         const response = await axios.post(
           `${import.meta.env.VITE_SERVER_URL}/user/signup`,
           {
-            name: values.name as string,
             email: values.email as string,
-            password: values.password as string,
           },
           {
             withCredentials: true,
@@ -87,7 +87,11 @@ const SignupForm: React.FC = () => {
         const data = response.data;
         console.log(data);
         if (data.success) {
+          setError(data.message);
           setFormType("otp");
+          setTimeout(() => {
+            setError(null);
+          }, 3000);
         } else {
           setError(data.message);
           setTimeout(() => {

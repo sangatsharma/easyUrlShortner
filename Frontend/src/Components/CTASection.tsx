@@ -2,7 +2,7 @@ import React from 'react';
 
 const CTASection: React.FC = () => {
   return (
-    <section className="bg-blue-50 p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-12 text-center">
+    <section className="bg-blue-50 p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-4 text-center">
       <h2 className="text-3xl font-extrabold text-gray-800 mb-4">
         Unlock the Full Potential of EasyURL!
       </h2>

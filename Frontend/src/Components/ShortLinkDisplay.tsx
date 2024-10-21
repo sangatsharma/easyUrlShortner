@@ -3,10 +3,11 @@ import React, { useState, useCallback } from 'react';
 // Props Interface
 interface ShortLinkProps {
   shortLink: string;
+  hide?: boolean;
 }
 
 // React.memo to prevent unnecessary re-renders
-const ShortLinkDisplay: React.FC<ShortLinkProps> = React.memo(({ shortLink }) => {
+const ShortLinkDisplay: React.FC<ShortLinkProps> = React.memo(({ shortLink,hide=false}) => {
   const [copySuccess, setCopySuccess] = useState(false);
 
   // Using useCallback to memoize the function
@@ -21,15 +22,15 @@ const ShortLinkDisplay: React.FC<ShortLinkProps> = React.memo(({ shortLink }) =>
   }, [shortLink]);
 
   return (
-    <div className="mt-8 flex justify-center items-center">
+    <div className="mt-2 sm:mt-4 flex flex-wrap justify-center items-center">
       {/* Hidden meta tag for SEO */}
       {shortLink && (
         <meta name="description" content={`Shortened link: ${shortLink}`} />
       )}
 
       {/* Accessible label for the input */}
-      <label htmlFor="shortLinkInput" className="sr-only">
-        Shortened Link
+      <label htmlFor="shortLinkInput" className={`${hide && "hidden"} pr-2`}>
+        Shortened URL : {"  "}
       </label>
 
       <input
@@ -37,9 +38,9 @@ const ShortLinkDisplay: React.FC<ShortLinkProps> = React.memo(({ shortLink }) =>
         type="text"
         value={shortLink}
         readOnly
-        onClick={()=>{window.open(shortLink, '_blank');}}
+        onClick={()=>{window.open(`https://${shortLink}`, '_blank');}}
         aria-label="Shortened link input"
-        className="w-44 px-4 py-2 border border-gray-300 rounded-l-md text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
+        className="w-44 px-4  py-2 border border-gray-300 rounded-l-md text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
       />
 
       <button

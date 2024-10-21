@@ -9,57 +9,124 @@ export const signupHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { email, password, name } = req.body;
-  if (!email || !password || !name) {
+  const { email } = req.body;
+  if (!email) {
     res.status(400).json({
       success: false,
-      message: "Email, password and name are required",
+      message: "Email is required",
     });
     return;
   }
   try {
     const user = await userModel.findOne({ email });
-    if (user) {
-      if (user.isEmailVerified)
-        res
-          .status(200)
-          .json({ success: false, message: "User already exists" });
-      else {
-        const otp = generateVerificationToken();
-        user.password = await bcryptjs.hash(password, 10);
-        user.name = name;
-        user.emailVerificationToken = otp;
-        user.emailVerificationTokenExpiry = new Date(
-          new Date().getTime() + 10 * 60 * 1000
-        );
-        await user.save();
-        sendOtpEmail(email, otp, name);
-        res
-          .status(200)
-          .json({ success: true, message: "Email is not verified." });
-      }
+    if (user && user.isEmailVerified) {
+      res.status(200).json({ success: false, message: "User already exists" });
       return;
     }
-    // Hash the password
-    const hashedPassword = await bcryptjs.hash(password, 10);
     const emailVerificationToken = generateVerificationToken();
+    const emailVerificationTokenExpiry = new Date(
+      new Date().getTime() + 10 * 60 * 1000
+    );
+
+    if (user && !user.isEmailVerified) {
+      if ((user.emailVerificationTokenExpiry as Date) > new Date()) {
+        res.status(200).json({ success: true, message: "OTP already sent" });
+        return;
+      }
+      user.emailVerificationToken = emailVerificationToken;
+      user.emailVerificationTokenExpiry = emailVerificationTokenExpiry;
+      await user.save();
+      sendOtpEmail(email, emailVerificationToken, "User");
+      res.status(200).json({
+        success: true,
+        message: "Please verify your email.",
+      });
+      return;
+    }
+
     const newUser = await userModel.create({
       email,
-      password: hashedPassword,
-      name,
       emailVerificationToken,
       emailVerificationTokenExpiry: new Date(
         new Date().getTime() + 10 * 60 * 1000
       ),
     });
-    sendOtpEmail(email, emailVerificationToken, name);
+    sendOtpEmail(email, emailVerificationToken, "User");
     res.status(200).json({
       success: true,
       message: "Please verify your email.",
     });
+    return;
   } catch (error) {
     console.log("Error in creating user: ", error);
     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const verificationHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { email, password, otp, name } = req.body;
+
+  // Validate input
+  if (!email || !otp || !password || !name) {
+    res.status(400).json({ message: "Email and OTP are required." });
+    return;
+  }
+
+  try {
+    // Find the user by email
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found." });
+      return;
+    }
+
+    // Check if OTP matches and is still valid
+    if (user.emailVerificationToken !== otp) {
+      res.status(200).json({ message: "Invalid OTP." });
+      return;
+    }
+
+    if ((user.emailVerificationTokenExpiry as Date) < new Date()) {
+      res.status(200).json({ message: "OTP has expired." });
+      return;
+    }
+
+    // Update user's email verification status
+    user.isEmailVerified = true;
+    user.name = name;
+    // Hash the password
+    user.password = await bcryptjs.hash(password, 10);
+    user.emailVerificationToken = null; // Clear the OTP
+    user.emailVerificationTokenExpiry = null; // Clear the expiry
+    await user.save();
+    generateAndSetCookie(
+      res,
+      user as {
+        _id: string;
+        email: string;
+        role: string;
+        name: string;
+      }
+    );
+    res.status(200).json({
+      success: true,
+      message: "OTP verified successfully",
+      user: {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        isEmailVerified: user.isEmailVerified,
+      },
+    });
+    return;
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error });
+    return;
   }
 };
 
@@ -93,9 +160,10 @@ export const loginHandler = async (
       );
       await user.save();
       sendOtpEmail(email, otp, user.name);
-      res
-        .status(200)
-        .json({ success: false, message: "Email is not verified." });
+      res.status(200).json({
+        success: false,
+        message: "Email was not verified. Please signup again.",
+      });
       return;
     }
     //jwt token
@@ -181,70 +249,6 @@ export const resetPasswordHandler = async (
   } catch (error) {
     console.log("Error in forgot password: ", error);
     res.status(500).json({ success: false, message: "Internal server error" });
-  }
-};
-
-export const verificationHandler = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const { email, otp } = req.body;
-
-  // Validate input
-  if (!email || !otp) {
-    res.status(400).json({ message: "Email and OTP are required." });
-    return;
-  }
-
-  try {
-    // Find the user by email
-    const user = await userModel.findOne({ email });
-
-    if (!user) {
-      res.status(404).json({ message: "User not found." });
-      return;
-    }
-
-    // Check if OTP matches and is still valid
-    if (user.emailVerificationToken !== otp) {
-      res.status(200).json({ message: "Invalid OTP." });
-      return;
-    }
-
-    if ((user.emailVerificationTokenExpiry as Date) < new Date()) {
-      res.status(200).json({ message: "OTP has expired." });
-      return;
-    }
-
-    // Update user's email verification status
-    user.isEmailVerified = true;
-    user.emailVerificationToken = null; // Clear the OTP
-    user.emailVerificationTokenExpiry = null; // Clear the expiry
-    await user.save();
-    generateAndSetCookie(
-      res,
-      user as {
-        _id: string;
-        email: string;
-        role: string;
-        name: string;
-      }
-    );
-    res.status(200).json({
-      success: true,
-      message: "OTP verified successfully",
-      user: {
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        isEmailVerified: user.isEmailVerified,
-      },
-    });
-    return;
-  } catch (error) {
-    console.error("Error verifying OTP:", error);
-    res.status(500).json({ message: "Internal Server Error", error: error });
-    return;
   }
 };
 

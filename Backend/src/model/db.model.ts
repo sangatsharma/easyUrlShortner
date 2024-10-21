@@ -7,6 +7,7 @@ interface IUrl extends Document {
   clicks: number;
   createdAt: Date;
   expiryDate: Date;
+  userId:mongoose.Schema.Types.ObjectId
 }
 
 // Define the schema for URLs with indexes on key fields
@@ -32,12 +33,10 @@ const urlSchema = new mongoose.Schema<IUrl>({
     required: true,
     default: Date.now,
   },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
   expiryDate: {
     type: Date,
     required: true,
-    default: function () {
-      return new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 7 days from now
-    },
     index: { expireAfterSeconds: 0 }, // TTL index for automatic deletion
   },
 });

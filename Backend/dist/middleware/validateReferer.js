@@ -6,6 +6,7 @@ const allowedDomains = [
     "https://www.easyurl.me",
     "https://easyurl.me",
     "http://localhost:5173",
+    "",
     // Local development
 ];
 /**

@@ -7,6 +7,8 @@ import RootPageLayout from "./Pages/RootPageLayout";
 import LoginForm from "./Pages/LoginForm";
 import SignupForm from "./Pages/SignupForm";
 import ForgotPassword from "./Pages/ForgotPassword";
+import Dashboard from "./Pages/Dashboard";
+import PrivateRoute from "./Pages/PrivateRoute";
 
 interface IAppProps {}
 
@@ -20,8 +22,9 @@ const App: React.FunctionComponent<IAppProps> = () => {
         { path: ":id", element: <RedirectPage /> },
         { path: "/", element: <Homepage /> },
         { path: "/login", element: <LoginForm /> },
-        { path: "/signup", element: <SignupForm/> },
-        { path: "/forgot-password", element: <ForgotPassword/> },
+        { path: "/signup", element: <SignupForm /> },
+        { path: "/dashboard", element: <PrivateRoute Component={Dashboard} /> },
+        { path: "/forgot-password", element: <ForgotPassword /> },
         {
           path: "/404",
           element: (
