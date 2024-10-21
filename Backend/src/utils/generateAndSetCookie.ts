@@ -18,9 +18,8 @@ export const generateAndSetCookie = (res: Response, user: {
     secure: (process.env.NODE_ENV as string) === "PROD",
     httpOnly: true,
     // sameSite: "strict",
-    sameSite: "lax",
+    sameSite: "lax", 
     path: "/",
-    domain:".me",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };

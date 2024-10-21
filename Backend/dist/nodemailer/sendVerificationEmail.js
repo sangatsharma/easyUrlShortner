@@ -25,7 +25,6 @@ const sendOtpEmail = (email, otp, username) => __awaiter(void 0, void 0, void 0,
             pass: process.env.EMAIL_PASSWORD,
         },
     });
-    console.log("email", process.env.EMAIL, process.env.EMAIL_PASSWORD);
     const mailOptions = {
         from: process.env.EMAIL,
         to: email,
