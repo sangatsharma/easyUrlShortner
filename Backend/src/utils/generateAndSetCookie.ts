@@ -17,10 +17,8 @@ export const generateAndSetCookie = (res: Response, user: {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     secure: (process.env.NODE_ENV as string) === "PROD",
     httpOnly: true,
-    // sameSite: "strict",
-    sameSite: "none", 
+    sameSite: "strict", 
     path: "/", // cookie will be sent to all routes
-    domain:"easyurl.me",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
