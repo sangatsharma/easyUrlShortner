@@ -7,15 +7,17 @@ export const authenticateJWT = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const token = req.cookies.token;
+    const encodedToken = req.cookies.token;
 
-    if (!token) {
+    if (!encodedToken) {
       res
         .status(401)
         .json({ success: false, message: "Unauthorized: No token provided" });
       return;
     }
 
+    // Decode the token to get the original JWT
+    const token = decodeURIComponent(encodedToken);
     // Verify token
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
     console.log("Decoded token: ", decodedToken);

@@ -18,8 +18,9 @@ export const generateAndSetCookie = (
     {
       expiresIn: "7d",
     }
-  );
-  res.cookie("token", token, {
+  ); // Encode the token to ensure it’s URL-safe
+  const encodedToken = encodeURIComponent(token);
+  res.cookie("token", encodedToken, {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     // secure: (process.env.NODE_ENV as string) === "PROD",
     secure: true,

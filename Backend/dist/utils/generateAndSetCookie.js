@@ -10,8 +10,9 @@ dotenv_1.default.config();
 const generateAndSetCookie = (res, user) => {
     const token = jsonwebtoken_1.default.sign({ _id: user._id, email: user.email, role: user.role, name: user.name }, process.env.JWT_SECRET, {
         expiresIn: "7d",
-    });
-    res.cookie("token", token, {
+    }); // Encode the token to ensure it’s URL-safe
+    const encodedToken = encodeURIComponent(token);
+    res.cookie("token", encodedToken, {
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         // secure: (process.env.NODE_ENV as string) === "PROD",
         secure: true,

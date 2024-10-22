@@ -16,13 +16,15 @@ exports.authenticateJWT = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authenticateJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const token = req.cookies.token;
-        if (!token) {
+        const encodedToken = req.cookies.token;
+        if (!encodedToken) {
             res
                 .status(401)
                 .json({ success: false, message: "Unauthorized: No token provided" });
             return;
         }
+        // Decode the token to get the original JWT
+        const token = decodeURIComponent(encodedToken);
         // Verify token
         const decodedToken = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
         console.log("Decoded token: ", decodedToken);

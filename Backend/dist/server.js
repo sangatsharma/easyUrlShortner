@@ -11,8 +11,9 @@ const dbConfig_1 = __importDefault(require("./config/dbConfig"));
 const easyurl_routes_1 = __importDefault(require("./routes/easyurl.routes"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const redisConfig_1 = require("./config/redisConfig");
-dotenv_1.default.config();
-(0, dbConfig_1.default)();
+dotenv_1.default.config(); // Load environment variables
+(0, dbConfig_1.default)(); // Connect to the database
+// Redis setup with reconnect logic
 redisConfig_1.redisClient
     .connect()
     .then(() => {
@@ -22,41 +23,61 @@ redisConfig_1.redisClient
     .catch((err) => {
     (0, redisConfig_1.setRedisStatus)(false);
     console.error("Redis connection error:", err);
-    //console.error("Redis connection error:", err);
 });
 redisConfig_1.redisClient.on("end", () => {
     console.log("Redis connection closed. Attempting to reconnect...");
-    setTimeout(() => redisConfig_1.redisClient
-        .connect()
-        .then(() => {
-        (0, redisConfig_1.setRedisStatus)(true);
-        console.log("Connected to Redis:", (0, redisConfig_1.getRedisStatus)());
-    })
-        .catch((err) => {
-        (0, redisConfig_1.setRedisStatus)(false);
-        console.error("Redis connection error:", err);
-        //console.error("Redis connection error:", err);
-    }), 1000); // Reconnect after 1 second
+    setTimeout(() => {
+        redisConfig_1.redisClient
+            .connect()
+            .then(() => {
+            (0, redisConfig_1.setRedisStatus)(true);
+            console.log("Connected to Redis:", (0, redisConfig_1.getRedisStatus)());
+        })
+            .catch((err) => {
+            (0, redisConfig_1.setRedisStatus)(false);
+            console.error("Redis reconnection error:", err);
+        });
+    }, 1000); // Reconnect after 1 second
 });
 const PORT = process.env.PORT || 5000;
 const app = (0, express_1.default)();
-//middleware to parse incoming JSON payloads and makes them available on req.body.
+// Parse incoming JSON and URL-encoded payloads
 app.use(express_1.default.json());
-app.use((0, cookie_parser_1.default)());
-//handles URL-encoded data
 app.use(express_1.default.urlencoded({ extended: true }));
+// Parse cookies in requests
+app.use((0, cookie_parser_1.default)());
+// CORS configuration for cross-origin requests
+const allowedOrigins = [
+    "http://localhost:5175",
+    "http://localhost:5173",
+    "https://www.easyurl.me",
+    "https://easyurl.me",
+    "https://easy-url-frontend.vercel.app",
+];
 app.use((0, cors_1.default)({
-    origin: [
-        "http://localhost:5175",
-        "http://localhost:5173",
-        "https://www.easyurl.me",
-        "https://easyurl.me",
-        "https://easy-url-frontend.vercel.app"
-    ],
-    credentials: true,
+    origin: (origin, callback) => {
+        // Check if the origin is in the allowed list or is undefined (for same-origin)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true, // Allow cookies to be sent with requests
 }));
+// Preflight request handling for all routes
+app.options("*", (req, res) => {
+    res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.sendStatus(204); // No Content
+});
+// Routes
 app.use("/", easyurl_routes_1.default);
 app.use("/user", user_routes_1.default);
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

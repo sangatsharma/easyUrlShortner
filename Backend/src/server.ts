@@ -11,9 +11,10 @@ import {
   setRedisStatus,
 } from "./config/redisConfig";
 
-dotenv.config();
-connectDb();
+dotenv.config(); // Load environment variables
+connectDb(); // Connect to the database
 
+// Redis setup with reconnect logic
 redisClient
   .connect()
   .then(() => {
@@ -23,49 +24,74 @@ redisClient
   .catch((err) => {
     setRedisStatus(false);
     console.error("Redis connection error:", err);
-    //console.error("Redis connection error:", err);
   });
 
 redisClient.on("end", () => {
   console.log("Redis connection closed. Attempting to reconnect...");
-  setTimeout(
-    () =>
-      redisClient
-        .connect()
-        .then(() => {
-          setRedisStatus(true);
-          console.log("Connected to Redis:", getRedisStatus());
-        })
-        .catch((err) => {
-          setRedisStatus(false);
-          console.error("Redis connection error:", err);
-          //console.error("Redis connection error:", err);
-        }),
-    1000
-  ); // Reconnect after 1 second
+  setTimeout(() => {
+    redisClient
+      .connect()
+      .then(() => {
+        setRedisStatus(true);
+        console.log("Connected to Redis:", getRedisStatus());
+      })
+      .catch((err) => {
+        setRedisStatus(false);
+        console.error("Redis reconnection error:", err);
+      });
+  }, 1000); // Reconnect after 1 second
 });
 
 const PORT = process.env.PORT || 5000;
 const app = express();
-//middleware to parse incoming JSON payloads and makes them available on req.body.
+
+// Parse incoming JSON and URL-encoded payloads
 app.use(express.json());
-app.use(cookieParser());
-//handles URL-encoded data
 app.use(express.urlencoded({ extended: true }));
+
+// Parse cookies in requests
+app.use(cookieParser());
+
+// CORS configuration for cross-origin requests
+const allowedOrigins = [
+  "http://localhost:5175",
+  "http://localhost:5173",
+  "https://www.easyurl.me",
+  "https://easyurl.me",
+  "https://easy-url-frontend.vercel.app",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5175",
-      "http://localhost:5173",
-      "https://www.easyurl.me",
-      "https://easyurl.me",
-      "https://easy-url-frontend.vercel.app"
-    ],
-    credentials: true,
+    origin: (origin, callback) => {
+      // Check if the origin is in the allowed list or is undefined (for same-origin)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Allow cookies to be sent with requests
   })
 );
+
+// Preflight request handling for all routes
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.sendStatus(204); // No Content
+});
+
+// Routes
 app.use("/", easyUrlRoutes);
 app.use("/user", userRoutes);
+
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

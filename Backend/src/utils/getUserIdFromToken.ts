@@ -7,13 +7,13 @@ export const getUserIdFromToken = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const token = req.cookies.token;
-    console.log("Token:", token);
-    if (!token) {
+    const encodedToken = req.cookies.token;
+    if (!encodedToken) {
       res.locals.user = null;
     } else {
+      // Decode the token to get the original JWT
+      const token = decodeURIComponent(encodedToken);
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
-      console.log("Decoded token:", decodedToken);
       res.locals.user = decodedToken;
     }
     next();

@@ -16,14 +16,14 @@ exports.getUserIdFromToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const getUserIdFromToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const token = req.cookies.token;
-        console.log("Token:", token);
-        if (!token) {
+        const encodedToken = req.cookies.token;
+        if (!encodedToken) {
             res.locals.user = null;
         }
         else {
+            // Decode the token to get the original JWT
+            const token = decodeURIComponent(encodedToken);
             const decodedToken = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-            console.log("Decoded token:", decodedToken);
             res.locals.user = decodedToken;
         }
         next();
