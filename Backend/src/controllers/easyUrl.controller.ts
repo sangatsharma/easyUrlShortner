@@ -59,7 +59,6 @@ export const getAllUrls = async (
   }
   try {
     const urls = await easyUrlModel.find({ userId: userId }).exec();
-    console.log("URLs:", urls);
     res.status(200).json({ success: true, urls: urls });
     return;
   } catch (error) {

@@ -64,7 +64,6 @@ const getAllUrls = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
     try {
         const urls = yield db_model_1.default.find({ userId: userId }).exec();
-        console.log("URLs:", urls);
         res.status(200).json({ success: true, urls: urls });
         return;
     }

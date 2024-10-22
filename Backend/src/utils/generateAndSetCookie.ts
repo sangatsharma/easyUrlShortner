@@ -9,7 +9,7 @@ export const generateAndSetCookie = (res: Response, user: {
   role: string;
   name: string;
 }) => {
-
+console.log( process.env.NODE_ENV === "PROD" ? ".easyurl.me" : ".localhost", process.env.NODE_ENV as string);
   const token = jwt.sign({ _id:user._id, email:user.email,role:user.role,name:user.name }, process.env.JWT_SECRET as string, {
     expiresIn: "7d",
   });
@@ -17,8 +17,9 @@ export const generateAndSetCookie = (res: Response, user: {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     secure: (process.env.NODE_ENV as string) === "PROD",
     httpOnly: true,
-    sameSite: "strict", 
+    sameSite: "lax", 
     path: "/", // cookie will be sent to all routes
+    domain: process.env.NODE_ENV === "PROD" ? "easyurl.me" : ".localhost",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };

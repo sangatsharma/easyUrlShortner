@@ -36,14 +36,14 @@ const LoginForm: React.FC = () => {
         );
         const data = response.data;
         console.log(data);
-        if (!data.success) {
+        if (data.success) {
+          // Redirects to dashboard on successful login from backend
+          window.location.href = "/dashboard";
+        } else {
           setError(data.message);
           setTimeout(() => {
             setError(null);
           }, 3000);
-        } else {
-          // Redirects to dashboard on successful login from backend
-          window.location.href = "/dashboard";
         }
       } catch (err) {
         console.log("Failed to login. Please try again.", err);
