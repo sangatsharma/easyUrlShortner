@@ -51,6 +51,7 @@ app.use((0, cors_1.default)({
         "http://localhost:5173",
         "https://www.easyurl.me",
         "https://easyurl.me",
+        "https://easy-url-frontend.vercel.app"
     ],
     credentials: true,
 }));

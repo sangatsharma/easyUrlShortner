@@ -5,6 +5,7 @@ const allowedDomains = [
   "https://www.easyurl.me",
   "https://easyurl.me",
   "http://localhost:5173",
+  "https://easy-url-frontend.vercel.app",
   "",
   // Local development
 ];

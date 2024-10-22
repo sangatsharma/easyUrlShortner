@@ -8,7 +8,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const generateAndSetCookie = (res, user) => {
-    console.log(process.env.NODE_ENV === "PROD" ? ".easyurl.me" : ".localhost", process.env.NODE_ENV);
     const token = jsonwebtoken_1.default.sign({ _id: user._id, email: user.email, role: user.role, name: user.name }, process.env.JWT_SECRET, {
         expiresIn: "7d",
     });
@@ -18,7 +17,7 @@ const generateAndSetCookie = (res, user) => {
         httpOnly: true,
         sameSite: "lax",
         path: "/", // cookie will be sent to all routes
-        domain: process.env.NODE_ENV === "PROD" ? "easyurl.me" : ".localhost",
+        domain: process.env.NODE_ENV === "PROD" ? ".easy-url-frontend.vercel.app/" : ".localhost",
         maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 };
