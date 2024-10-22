@@ -17,7 +17,7 @@ const generateAndSetCookie = (res, user) => {
         httpOnly: true,
         sameSite: "lax",
         path: "/", // cookie will be sent to all routes
-        domain: process.env.NODE_ENV === "PROD" ? ".easy-url-frontend.vercel.app/" : ".localhost",
+        domain: process.env.NODE_ENV === "PROD" ? ".easy-url-frontend.vercel.app" : ".localhost",
         maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 };
