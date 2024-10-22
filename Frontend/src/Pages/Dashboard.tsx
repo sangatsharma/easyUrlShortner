@@ -34,7 +34,7 @@ const Dashboard: React.FunctionComponent<IDashboardProps> = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/api/urls/All/`,
+        `${import.meta.env.VITE_SERVER_URL}/api/urls/all`,
         { withCredentials: true }
       );
       const data = response.data;

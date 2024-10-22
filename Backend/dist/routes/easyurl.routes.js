@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
     res.send("Welcome to EasyUrl");
 });
 // Route to get all URLs (secured with validateReferer middleware)
-router.get("/api/urls/All", validateReferer_1.validateReferer, getUserIdFromToken_1.getUserIdFromToken, easyurl_controller_1.getAllUrls);
+router.get("/api/urls/all", validateReferer_1.validateReferer, getUserIdFromToken_1.getUserIdFromToken, easyurl_controller_1.getAllUrls);
 // Route to get long URL by ID
 router.get("/api/getLongUrl/:id", validateReferer_1.validateReferer, easyurl_controller_1.getUrl);
 // Route to delete a short URL by ID

@@ -21,12 +21,15 @@ export const generateAndSetCookie = (
   );
   res.cookie("token", token, {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    secure: (process.env.NODE_ENV as string) === "PROD",
+    // secure: (process.env.NODE_ENV as string) === "PROD",
+    secure: true,
     httpOnly: true,
-    sameSite: (process.env.NODE_ENV as string) === "PROD" ? "strict" : "lax",
+    // sameSite: (process.env.NODE_ENV as string) === "PROD" ? "none" : "lax",
+    sameSite: "none",
     path: "/", // cookie will be sent to all routes
-    domain:
-      (process.env.NODE_ENV as string) === "PROD" ? ".vercel.app" : "localhost",
+    domain: ".easyurl.me",
+    // domain:
+    //   (process.env.NODE_ENV as string) === "PROD" ? ".vercel.app" : "localhost",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };

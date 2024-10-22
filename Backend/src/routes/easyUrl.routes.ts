@@ -20,7 +20,7 @@ router.get("/", (req: Request, res: Response) => {
 });
 
 // Route to get all URLs (secured with validateReferer middleware)
-router.get("/api/urls/All", validateReferer,getUserIdFromToken, getAllUrls);
+router.get("/api/urls/all", validateReferer,getUserIdFromToken, getAllUrls);
 
 // Route to get long URL by ID
 router.get("/api/getLongUrl/:id", validateReferer, getUrl);
