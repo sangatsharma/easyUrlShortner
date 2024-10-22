@@ -24,8 +24,7 @@ export const generateAndSetCookie = (
     // secure: (process.env.NODE_ENV as string) === "PROD",
     secure: true,
     httpOnly: true,
-    sameSite: "lax",
-    // sameSite: (process.env.NODE_ENV as string) === "PROD" ? "lax" : "lax",
+    sameSite: (process.env.NODE_ENV as string) === "PROD" ? "none" : "lax",
     path: "/", // cookie will be sent to all routes
     // domain:
     //   (process.env.NODE_ENV as string) === "PROD" ? ".vercel.app" : "localhost",
