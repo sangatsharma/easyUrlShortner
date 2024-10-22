@@ -103,7 +103,7 @@ export const verificationHandler = async (
     user.emailVerificationToken = null; // Clear the OTP
     user.emailVerificationTokenExpiry = null; // Clear the expiry
     await user.save();
-    generateAndSetCookie(
+    await generateAndSetCookie(
       res,
       user as {
         _id: string;
@@ -153,13 +153,6 @@ export const loginHandler = async (
       return;
     }
     if (!user.isEmailVerified) {
-      const otp = generateVerificationToken();
-      user.emailVerificationToken = otp;
-      user.emailVerificationTokenExpiry = new Date(
-        new Date().getTime() + 10 * 60 * 1000
-      );
-      await user.save();
-      sendOtpEmail(email, otp, user.name);
       res.status(200).json({
         success: false,
         message: "Email was not verified. Please signup again.",
@@ -167,7 +160,7 @@ export const loginHandler = async (
       return;
     }
     //jwt token
-    generateAndSetCookie(
+    await generateAndSetCookie(
       res,
       user as {
         _id: string;
@@ -179,6 +172,7 @@ export const loginHandler = async (
     res
       .status(200)
       .json({ success: true, message: "User logged in successfully." });
+      return;
   } catch (error) {
     console.log("Error in logging in user: ", error);
     res.status(500).json({ success: false, message: "Internal server error" });

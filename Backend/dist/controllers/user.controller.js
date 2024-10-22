@@ -99,7 +99,7 @@ const verificationHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         user.emailVerificationToken = null; // Clear the OTP
         user.emailVerificationTokenExpiry = null; // Clear the expiry
         yield user.save();
-        (0, generateAndSetCookie_1.generateAndSetCookie)(res, user);
+        yield (0, generateAndSetCookie_1.generateAndSetCookie)(res, user);
         res.status(200).json({
             success: true,
             message: "OTP verified successfully",
@@ -139,11 +139,6 @@ const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return;
         }
         if (!user.isEmailVerified) {
-            const otp = (0, generateVerificationToken_1.generateVerificationToken)();
-            user.emailVerificationToken = otp;
-            user.emailVerificationTokenExpiry = new Date(new Date().getTime() + 10 * 60 * 1000);
-            yield user.save();
-            (0, sendVerificationEmail_1.sendOtpEmail)(email, otp, user.name);
             res.status(200).json({
                 success: false,
                 message: "Email was not verified. Please signup again.",
@@ -151,10 +146,11 @@ const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return;
         }
         //jwt token
-        (0, generateAndSetCookie_1.generateAndSetCookie)(res, user);
+        yield (0, generateAndSetCookie_1.generateAndSetCookie)(res, user);
         res
             .status(200)
             .json({ success: true, message: "User logged in successfully." });
+        return;
     }
     catch (error) {
         console.log("Error in logging in user: ", error);
