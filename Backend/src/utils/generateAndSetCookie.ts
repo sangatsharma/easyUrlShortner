@@ -23,9 +23,10 @@ export const generateAndSetCookie = (
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     secure: (process.env.NODE_ENV as string) === "PROD",
     httpOnly: true,
-    sameSite:"none",
+    sameSite: (process.env.NODE_ENV as string) === "PROD" ? "none" : "lax",
     path: "/", // cookie will be sent to all routes
-    domain: process.env.NODE_ENV === "PROD" ? ".easyurl.me" : ".localhost",
+    domain:
+      (process.env.NODE_ENV as string) === "PROD" ? ".easyurl.me" : "localhost",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
