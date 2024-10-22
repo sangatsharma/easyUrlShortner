@@ -17,7 +17,7 @@ const generateAndSetCookie = (res, user) => {
         secure: true,
         httpOnly: true,
         // sameSite: (process.env.NODE_ENV as string) === "PROD" ? "none" : "lax",
-        sameSite: "strict",
+        sameSite: "lax",
         path: "/", // cookie will be sent to all routes
         // domain: ".easyurl.me",
         // domain:
