@@ -24,10 +24,9 @@ export const generateAndSetCookie = (
     // secure: (process.env.NODE_ENV as string) === "PROD",
     secure: true,
     httpOnly: true,
-    // sameSite: (process.env.NODE_ENV as string) === "PROD" ? "none" : "lax",
-    sameSite: "none",
+    sameSite: "lax",
+    // sameSite: (process.env.NODE_ENV as string) === "PROD" ? "lax" : "lax",
     path: "/", // cookie will be sent to all routes
-    // domain: ".easyurl.me",
     // domain:
     //   (process.env.NODE_ENV as string) === "PROD" ? ".vercel.app" : "localhost",
     maxAge: 7 * 24 * 60 * 60 * 1000,
