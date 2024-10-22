@@ -46,6 +46,10 @@ const LoginForm: React.FC = () => {
           }, 3000);
         }
       } catch (err) {
+        setError("Failed to login. Please try again.");
+        setTimeout(() => {
+          setError(null);
+        }, 3000);
         console.log("Failed to login. Please try again.", err);
       } finally {
         setLoading(false);

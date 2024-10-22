@@ -15,9 +15,9 @@ const generateAndSetCookie = (res, user) => {
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         secure: process.env.NODE_ENV === "PROD",
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "strict",
         path: "/", // cookie will be sent to all routes
-        domain: process.env.NODE_ENV === "PROD" ? ".easy-url-frontend.vercel.app" : ".localhost",
+        domain: process.env.NODE_ENV === "PROD" ? ".easyurl.me" : ".localhost",
         maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 };
