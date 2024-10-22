@@ -15,7 +15,7 @@ const generateAndSetCookie = (res, user) => {
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         secure: process.env.NODE_ENV === "PROD",
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === "PROD" ? "lax" : "lax",
+        sameSite: process.env.NODE_ENV === "PROD" ? "none" : "lax",
         path: "/", // cookie will be sent to all routes
         domain: process.env.NODE_ENV === "PROD" ? ".vercel.app" : "localhost",
         maxAge: 7 * 24 * 60 * 60 * 1000,
