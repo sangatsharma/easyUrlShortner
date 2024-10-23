@@ -63,18 +63,10 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Check if the origin is in the allowed list or is undefined (for same-origin)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins, // Directly pass the array of allowed origins
     credentials: true, // Allow cookies to be sent with requests
   })
 );
-
 // Preflight request handling for all routes
 app.options("*", (req, res) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");

@@ -85,7 +85,7 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links }) => {
                     </p>
                   </td>
                   <td className="border border-gray-300 p-2 ">
-                    <div className="w-64">
+                    <div className="w-64 mx-auto">
                       <ShortLinkDisplay
                         shortLink={`easyurl.me/${item.shortId}`}
                         hide={true}
