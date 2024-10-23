@@ -36,7 +36,7 @@ export const signupHandler = async (
       user.emailVerificationToken = emailVerificationToken;
       user.emailVerificationTokenExpiry = emailVerificationTokenExpiry;
       await user.save();
-      sendOtpEmail(email, emailVerificationToken, "User");
+      await sendOtpEmail(email, emailVerificationToken, "User");
       res.status(200).json({
         success: true,
         message: "Please verify your email.",
@@ -51,7 +51,7 @@ export const signupHandler = async (
         new Date().getTime() + 10 * 60 * 1000
       ),
     });
-    sendOtpEmail(email, emailVerificationToken, "User");
+    await sendOtpEmail(email, emailVerificationToken, "User");
     res.status(200).json({
       success: true,
       message: "Please verify your email.",
@@ -172,7 +172,7 @@ export const loginHandler = async (
     res
       .status(200)
       .json({ success: true, message: "User logged in successfully." });
-      return;
+    return;
   } catch (error) {
     console.log("Error in logging in user: ", error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -267,7 +267,7 @@ export const resendOtpHandler = async (
       new Date().getTime() + 10 * 60 * 1000
     );
     await user.save();
-    sendOtpEmail(email, otp, user.name);
+    await sendOtpEmail(email, otp, user.name);
     res.status(200).json({
       success: true,
       message: "OTP sent successfully",
@@ -300,7 +300,7 @@ export const findUserHandler = async (
       new Date().getTime() + 10 * 60 * 1000
     );
     await user.save();
-    sendOtpEmail(email, otp, user.name);
+    await sendOtpEmail(email, otp, user.name);
     res.status(200).json({
       success: true,
       message: "OTP sent successfully",

@@ -43,7 +43,7 @@ const signupHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             user.emailVerificationToken = emailVerificationToken;
             user.emailVerificationTokenExpiry = emailVerificationTokenExpiry;
             yield user.save();
-            (0, sendVerificationEmail_1.sendOtpEmail)(email, emailVerificationToken, "User");
+            yield (0, sendVerificationEmail_1.sendOtpEmail)(email, emailVerificationToken, "User");
             res.status(200).json({
                 success: true,
                 message: "Please verify your email.",
@@ -55,7 +55,7 @@ const signupHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             emailVerificationToken,
             emailVerificationTokenExpiry: new Date(new Date().getTime() + 10 * 60 * 1000),
         });
-        (0, sendVerificationEmail_1.sendOtpEmail)(email, emailVerificationToken, "User");
+        yield (0, sendVerificationEmail_1.sendOtpEmail)(email, emailVerificationToken, "User");
         res.status(200).json({
             success: true,
             message: "Please verify your email.",
@@ -230,7 +230,7 @@ const resendOtpHandler = (req, res) => __awaiter(void 0, void 0, void 0, functio
         user.emailVerificationToken = otp;
         user.emailVerificationTokenExpiry = new Date(new Date().getTime() + 10 * 60 * 1000);
         yield user.save();
-        (0, sendVerificationEmail_1.sendOtpEmail)(email, otp, user.name);
+        yield (0, sendVerificationEmail_1.sendOtpEmail)(email, otp, user.name);
         res.status(200).json({
             success: true,
             message: "OTP sent successfully",
@@ -259,7 +259,7 @@ const findUserHandler = (req, res) => __awaiter(void 0, void 0, void 0, function
         user.emailVerificationToken = otp;
         user.emailVerificationTokenExpiry = new Date(new Date().getTime() + 10 * 60 * 1000);
         yield user.save();
-        (0, sendVerificationEmail_1.sendOtpEmail)(email, otp, user.name);
+        yield (0, sendVerificationEmail_1.sendOtpEmail)(email, otp, user.name);
         res.status(200).json({
             success: true,
             message: "OTP sent successfully",
