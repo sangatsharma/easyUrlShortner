@@ -37,7 +37,7 @@ redisConfig_1.redisClient.on("end", () => {
             (0, redisConfig_1.setRedisStatus)(false);
             console.error("Redis reconnection error:", err);
         });
-    }, 1000); // Reconnect after 1 second
+    }, 5000); // Reconnect after 5 second
 });
 const PORT = process.env.PORT || 5000;
 const app = (0, express_1.default)();
@@ -54,18 +54,18 @@ const allowedOrigins = [
     "https://easyurl.me",
     "https://easy-url-frontend.vercel.app",
 ];
-app.use((0, cors_1.default)({
-    origin: allowedOrigins, // Directly pass the array of allowed origins
-    credentials: true, // Allow cookies to be sent with requests
-}));
-// Preflight request handling for all routes
-app.options("*", (req, res) => {
-    res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.sendStatus(204); // No Content
-});
+// Define CORS options
+const corsOptions = {
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    optionsSuccessStatus: 204,
+};
+// Use CORS middleware with options
+app.use((0, cors_1.default)(corsOptions));
+// OPTIONS route (optional, useful for preflight requests)
+app.options("*", (0, cors_1.default)(corsOptions));
 // Routes
 app.use("/", easyurl_routes_1.default);
 app.use("/user", user_routes_1.default);
