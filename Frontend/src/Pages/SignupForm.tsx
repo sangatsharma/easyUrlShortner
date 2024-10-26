@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import ResendOTPButton from "../Components/ResendOTPButton";
+import ResendOTPButton from "../components/ResendOTPButton";
 
 const SignupForm: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);

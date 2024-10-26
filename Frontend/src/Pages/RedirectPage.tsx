@@ -15,11 +15,7 @@ const RedirectPage: React.FC = () => {
   }, [id]);
 
   // If redirected, this won't render; it's a fallback in case of issues.
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <h1>Redirecting...</h1>
-    </div>
-  );
+  return <></>;
 };
 
 export default RedirectPage;

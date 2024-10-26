@@ -1,6 +1,6 @@
 import * as React from "react";
-import UrlShortener from "../Components/UrlShortener";
-import UrlTable from "../Components/URLtable";
+import UrlShortener from "../components/UrlShortener";
+import UrlTable from "../components/URLtable";
 import axios from "axios";
 
 interface IDashboardProps {}

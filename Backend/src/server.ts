@@ -54,7 +54,7 @@ app.use(cookieParser());
 
 // CORS configuration for cross-origin requests
 const allowedOrigins = [
-  "http://localhost:5175",
+  "http://localhost:5174",
   "http://localhost:5173",
   "https://www.easyurl.me",
   "https://easyurl.me",

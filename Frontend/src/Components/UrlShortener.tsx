@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from "react";
 import axios from "axios";
-import ShortLinkDisplay from "./ShortLinkDisplay";
+
 import { isValidUrl } from "../utils/validUrlChecker.ts";
+import ShortLinkDisplay from "./ShortLinkDisplay.tsx";
 
 
 const UrlShortener: React.FC = () => {

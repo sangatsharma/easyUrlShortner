@@ -1,7 +1,7 @@
 import * as React from "react";
-import UrlShortener from "../Components/UrlShortener";
-import CTASection from "../Components/CTASection";
-import FeaturesSection from "../Components/FeaturesSection";
+import UrlShortener from "../components/UrlShortener";
+import CTASection from "../components/CTASection";
+import FeaturesSection from "../components/FeaturesSection";
 
 
 interface IHomepageProps {}

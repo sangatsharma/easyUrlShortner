@@ -1,19 +1,20 @@
 import * as React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Homepage from "./Pages/Homepage";
-import PageNotFound from "./Pages/PageNotFound";
-import RedirectPage from "./Pages/RedirectPage";
-import RootPageLayout from "./Pages/RootPageLayout";
-import LoginForm from "./Pages/LoginForm";
-import SignupForm from "./Pages/SignupForm";
-import ForgotPassword from "./Pages/ForgotPassword";
-import Dashboard from "./Pages/Dashboard";
-import PrivateRoute from "./Pages/PrivateRoute";
+import Homepage from "./pages/Homepage";
+import PageNotFound from "./pages/PageNotFound";
+import RedirectPage from "./pages/RedirectPage";
+import RootPageLayout from "./pages/RootPageLayout";
+import LoginForm from "./pages/LoginForm";
+import SignupForm from "./pages/SignupForm";
+import ForgotPassword from "./pages/ForgotPassword";
+import Dashboard from "./pages/Dashboard";
+import PrivateRoute from "./pages/PrivateRoute";
 
 interface IAppProps {}
 
 const App: React.FunctionComponent<IAppProps> = () => {
   const router = createBrowserRouter([
+    { path: "/:id", element: <RedirectPage />, errorElement: <PageNotFound /> },
     {
       path: "/",
       element: <RootPageLayout />,

@@ -98,11 +98,11 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links }) => {
                   <td className="border border-gray-300 px-4 py-2 text-center">
                     {getFormattedDate(item.expiryDate)}
                   </td>
-                  <td className="border border-gray-300 py-1 text-center">
+                  <td className="border border-gray-300 py-1">
                     <img
                       src={qrLinks[index]}
                       alt="Generated QR Code"
-                      className=" border"
+                      className="border mx-auto"
                     />
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-center">
