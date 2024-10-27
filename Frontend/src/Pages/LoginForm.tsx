@@ -37,7 +37,6 @@ const LoginForm: React.FC = () => {
         const data = response.data;
         console.log(data);
         if (data.success) {
-          // Redirects to dashboard on successful login from backend
           window.location.href = "/dashboard";
         } else {
           setError(data.message);
