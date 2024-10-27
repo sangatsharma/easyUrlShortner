@@ -50,7 +50,7 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links }) => {
             <tr className="bg-blue-600 text-white">
               <th className="border border-gray-300 px-4 py-2">S.N</th>
               <th className="border border-gray-300 px-4 py-2 ">Full URL</th>
-              <th className="border border-gray-300 px-4 py-2">Short URL</th>
+              <th className="border border-gray-300">Short URL</th>
               <th className="border border-gray-300 px-4 py-2">
                 Date Shortened
               </th>
@@ -84,8 +84,8 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links }) => {
                       </a>
                     </p>
                   </td>
-                  <td className="border border-gray-300 p-2 ">
-                    <div className="w-64 mx-auto">
+                  <td className="border border-gray-300">
+                    <div className="w-72 mx-auto">
                       <ShortLinkDisplay
                         shortLink={`easyurl.me/${item.shortId}`}
                         hide={true}
@@ -93,7 +93,7 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links }) => {
                     </div>
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-center">
-                    {getFormattedDate(item.expiryDate)}
+                    {getFormattedDate(item.createdAt)}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-center">
                     {getFormattedDate(item.expiryDate)}

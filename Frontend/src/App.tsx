@@ -1,8 +1,8 @@
 import * as React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Homepage from "./pages/Homepage";
-import PageNotFound from "./pages/PageNotFound";
-import RedirectPage from "./pages/RedirectPage";
+import Homepage from "./pages/Homepage.tsx";
+import PageNotFound from "./pages/PageNotFound.tsx";
+import RedirectPage from "./pages/RedirectPage.tsx";
 import RootPageLayout from "./pages/RootPageLayout";
 import LoginForm from "./pages/LoginForm";
 import SignupForm from "./pages/SignupForm";

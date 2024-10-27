@@ -23,8 +23,8 @@ const Header: React.FC = () => {
               </a>
             </li>
             <li>
-              <a href="/about" className="text-sm hover:underline">
-                About Us
+              <a href="/dashboard" className="text-sm hover:underline">
+                Dashboard
               </a>
             </li>
           </ul>

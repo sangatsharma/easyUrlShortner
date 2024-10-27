@@ -4,7 +4,7 @@ export const getFormattedDate = (dateString: string): string => {
 
   // Extract year, month, and day
   const year = date.getUTCFullYear();
-  const month = date.getUTCMonth(); // Months are zero-based
+  const month = date.getUTCMonth()+1; // Months are zero-based
   const day = date.getUTCDate();
   return `${year}-${month}-${day}`;
 };
