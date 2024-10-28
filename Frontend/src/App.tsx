@@ -11,12 +11,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import PrivateRoute from "./pages/PrivateRoute.tsx";
 
 interface IAppProps {}
-React.useEffect(() => {
-  
 
-
-
-},[]);
 
 const App: React.FunctionComponent<IAppProps> = () => {
   const router = createBrowserRouter([
