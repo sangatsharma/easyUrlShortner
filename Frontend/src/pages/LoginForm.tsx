@@ -3,8 +3,16 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import axios from "axios";
+interface ILoginFormProps {
+  isAuthenticated: boolean;
+  loading: boolean;
+}
 
-const LoginForm: React.FC = () => {
+const LoginForm: React.FC<ILoginFormProps> = (props) => {
+  if (!props.loading && props.isAuthenticated) {
+    window.location.href = "/dashboard";
+  }
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 

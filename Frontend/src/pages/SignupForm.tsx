@@ -6,7 +6,18 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import ResendOTPButton from "../components/ResendOTPButton";
 
-const SignupForm: React.FC = () => {
+interface ISignupFormProps {
+  isAuthenticated: boolean;
+  loading: boolean;
+}
+
+
+
+const SignupForm: React.FC<ISignupFormProps> = (props) => {
+
+  if(!props.loading && props.isAuthenticated){
+    window.location.href = "/dashboard";
+  }
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [formType, setFormType] = useState<"signup" | "otp">("signup");

@@ -20,7 +20,6 @@ export const authenticateJWT = async (
     const token = decodeURIComponent(encodedToken);
     // Verify token
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
-    console.log("Decoded token: ", decodedToken);
     // Attach decoded token to the request (optional, if you need it later)
     res.locals.user = decodedToken;
     // If token is valid, proceed to the next middleware/route handler

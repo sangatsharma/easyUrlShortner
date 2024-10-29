@@ -208,9 +208,15 @@ export const validateUserHandler = async (
     res.status(400).json({ success: false, message: "User is required" });
     return;
   }
-  res
-    .status(200)
-    .json({ success: true, message: "User validated successfully.", user });
+  res.status(200).json({
+    success: true,
+    message: "User validated successfully.",
+    user: {
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    },
+  });
   return;
 };
 

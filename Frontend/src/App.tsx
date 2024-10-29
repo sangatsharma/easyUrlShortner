@@ -9,23 +9,34 @@ import SignupForm from "./pages/SignupForm.tsx";
 import ForgotPassword from "./pages/ForgotPassword.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import PrivateRoute from "./pages/PrivateRoute.tsx";
+import { validateToken } from "./store/authSlice.ts";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "./store/store.ts";
 
 interface IAppProps {}
 
-
 const App: React.FunctionComponent<IAppProps> = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, isAuthenticated } = useSelector((state: any) => state.auth);
+
+  // Validate token on app load
+  useEffect(() => {
+    dispatch(validateToken());
+  }, [dispatch]);
+
   const router = createBrowserRouter([
     { path: "/:id", element: <RedirectPage />, errorElement: <PageNotFound /> },
     {
       path: "/",
-      element: <RootPageLayout />,
+      element: <RootPageLayout isAuthenticated={isAuthenticated} loading={loading} />,
       errorElement: <PageNotFound />,
       children: [
         { path: ":id", element: <RedirectPage /> },
         { path: "/", element: <Homepage /> },
-        { path: "/login", element: <LoginForm /> },
-        { path: "/signup", element: <SignupForm /> },
-        { path: "/dashboard", element: <PrivateRoute Component={Dashboard} /> },
+        { path: "/login", element: <LoginForm  isAuthenticated={isAuthenticated} loading={loading}   /> },
+        { path: "/signup", element: <SignupForm  isAuthenticated={isAuthenticated} loading={loading}    /> },
+        { path: "/dashboard", element: <PrivateRoute Component={Dashboard} isAuthenticated={isAuthenticated} loading={loading} /> },
         { path: "/forgot-password", element: <ForgotPassword /> },
         {
           path: "/404",
