@@ -87,6 +87,7 @@ const authSlice = createSlice({
 
 // Export actions and reducer
 export const { setAuthenticated, setLoading, logout } = authSlice.actions;
+;
 export default authSlice.reducer;
 // Selector to get authentication state
 export const selectAuth = (state: RootState) => state.auth;

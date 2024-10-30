@@ -12,13 +12,15 @@ import PrivateRoute from "./pages/PrivateRoute.tsx";
 import { validateToken } from "./store/authSlice.ts";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "./store/store.ts";
+import { AppDispatch, RootState } from "./store/store.ts";
 
 interface IAppProps {}
 
 const App: React.FunctionComponent<IAppProps> = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, isAuthenticated } = useSelector((state: any) => state.auth);
+  const { loading, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   // Validate token on app load
   useEffect(() => {
@@ -26,17 +28,46 @@ const App: React.FunctionComponent<IAppProps> = () => {
   }, [dispatch]);
 
   const router = createBrowserRouter([
-    { path: "/:id", element: <RedirectPage />, errorElement: <PageNotFound /> },
+    {
+      path: "/:id",
+      element: <RedirectPage />,
+      errorElement: (
+        <PageNotFound isAuthenticated={isAuthenticated} loading={loading} />
+      ),
+    },
     {
       path: "/",
-      element: <RootPageLayout isAuthenticated={isAuthenticated} loading={loading} />,
-      errorElement: <PageNotFound />,
+      element: (
+        <RootPageLayout isAuthenticated={isAuthenticated} loading={loading} />
+      ),
+      errorElement: (
+        <PageNotFound isAuthenticated={isAuthenticated} loading={loading} />
+      ),
       children: [
         { path: ":id", element: <RedirectPage /> },
         { path: "/", element: <Homepage /> },
-        { path: "/login", element: <LoginForm  isAuthenticated={isAuthenticated} loading={loading}   /> },
-        { path: "/signup", element: <SignupForm  isAuthenticated={isAuthenticated} loading={loading}    /> },
-        { path: "/dashboard", element: <PrivateRoute Component={Dashboard} isAuthenticated={isAuthenticated} loading={loading} /> },
+        {
+          path: "/login",
+          element: (
+            <LoginForm isAuthenticated={isAuthenticated} loading={loading} />
+          ),
+        },
+        {
+          path: "/signup",
+          element: (
+            <SignupForm isAuthenticated={isAuthenticated} loading={loading} />
+          ),
+        },
+        {
+          path: "/dashboard",
+          element: (
+            <PrivateRoute
+              Component={Dashboard}
+              isAuthenticated={isAuthenticated}
+              loading={loading}
+            />
+          ),
+        },
         { path: "/forgot-password", element: <ForgotPassword /> },
         {
           path: "/404",
