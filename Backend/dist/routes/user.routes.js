@@ -13,10 +13,11 @@ router.get("/", (req, res) => {
 });
 router.get("/auth", authenticateJWT_1.authenticateJWT, user_controller_1.validateUserHandler);
 router.post("/auth/login", validateReferer_1.validateReferer, user_controller_1.loginHandler);
-router.post("/auth/logout", validateReferer_1.validateReferer, user_controller_1.logoutHandler);
+router.get("/auth/logout", validateReferer_1.validateReferer, user_controller_1.logoutHandler);
 router.post("/signup", validateReferer_1.validateReferer, user_controller_1.signupHandler);
 router.delete("/auth/deactivate", validateReferer_1.validateReferer, user_controller_1.deactivateHandler);
-router.post("/verify/", validateReferer_1.validateReferer, user_controller_1.verificationHandler);
+router.post("/verify", validateReferer_1.validateReferer, user_controller_1.verificationHandler);
+router.post("/verifyOtp", validateReferer_1.validateReferer, user_controller_1.otpVerificationHandler);
 router.post("/resendOtp", validateReferer_1.validateReferer, user_controller_1.resendOtpHandler);
 router.post("/auth/reset-password", validateReferer_1.validateReferer, user_controller_1.resetPasswordHandler);
 router.post("/find", validateReferer_1.validateReferer, user_controller_1.findUserHandler);

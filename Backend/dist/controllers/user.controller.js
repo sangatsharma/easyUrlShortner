@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findUserHandler = exports.resendOtpHandler = exports.resetPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.verificationHandler = exports.signupHandler = void 0;
+exports.findUserHandler = exports.resendOtpHandler = exports.resetPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.verificationHandler = exports.otpVerificationHandler = exports.signupHandler = void 0;
 const user_model_1 = __importDefault(require("../model/user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generateVerificationToken_1 = require("../utils/generateVerificationToken");
@@ -68,11 +68,47 @@ const signupHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.signupHandler = signupHandler;
+const otpVerificationHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, otp } = req.body;
+    // Validate input
+    if (!email || !otp) {
+        res.status(400).json({ message: "Email and OTP are required." });
+        return;
+    }
+    try {
+        // Find the user by email
+        const user = yield user_model_1.default.findOne({ email });
+        if (!user) {
+            res.status(404).json({ message: "User not found." });
+            return;
+        }
+        // Check if OTP matches and is still valid
+        if (user.emailVerificationToken !== otp) {
+            res.status(200).json({ success: false, message: "Invalid OTP." });
+            return;
+        }
+        if (user.emailVerificationTokenExpiry < new Date()) {
+            res.status(200).json({ success: false, message: "OTP has expired." });
+            return;
+        }
+        res.status(200).json({
+            success: true,
+            message: "OTP verified successfully",
+        });
+        return;
+    }
+    catch (error) {
+        console.error("Error verifying OTP:", error);
+        res.status(500).json({ message: "Internal Server Error", error: error });
+        return;
+    }
+});
+exports.otpVerificationHandler = otpVerificationHandler;
 const verificationHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, otp, name } = req.body;
     // Validate input
     if (!email || !otp || !password || !name) {
-        res.status(400).json({ message: "Email and OTP are required." });
+        res.status(400).json({ message: "All fields are required." });
         return;
     }
     try {
@@ -159,10 +195,26 @@ const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.loginHandler = loginHandler;
 const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    //todo implement logout using cookies
-    res
-        .status(200)
-        .json({ success: true, message: "User logged out successfully." });
+    try {
+        // Clear the cookie storing authentication/session info
+        res.clearCookie("token", {
+            httpOnly: true, // Ensures cookie is not accessible via client-side scripts
+            secure: true, // Send cookie over HTTPS only in production
+            sameSite: "lax", // Helps prevent CSRF attacks
+            path: "/", // Ensure it covers the entire site
+        });
+        res.status(200).json({
+            success: true,
+            message: "User logged out successfully.",
+        });
+    }
+    catch (error) {
+        console.error("Logout error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to logout. Please try again.",
+        });
+    }
 });
 exports.logoutHandler = logoutHandler;
 const deactivateHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

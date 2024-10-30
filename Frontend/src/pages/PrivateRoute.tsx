@@ -1,5 +1,5 @@
 import * as React from "react";
-import LoginForm from "./LoginForm";
+import { Navigate } from "react-router-dom";
 
 interface IPrivateRouteProps {
   isAuthenticated: boolean;
@@ -15,11 +15,7 @@ const PrivateRoute: React.FunctionComponent<IPrivateRouteProps> = ({
   if (loading) {
     return <div>Loading...</div>;
   }
-  return isAuthenticated ? (
-    <Component />
-  ) : (
-    <LoginForm isAuthenticated={isAuthenticated} loading={loading} />
-  );
+  return isAuthenticated ? <Component /> : <Navigate to="/login" replace />;
 };
 
 export default PrivateRoute;

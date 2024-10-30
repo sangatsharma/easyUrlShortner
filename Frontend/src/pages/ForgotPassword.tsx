@@ -27,7 +27,7 @@ const ForgotPassword: React.FC = () => {
       setLoading(true);
       console.log(emailFormik.values.email, otp);
       const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/user/verify`,
+        `${import.meta.env.VITE_SERVER_URL}/user/verifyOtp`,
         {
           email: emailFormik.values.email as string,
           otp: otp as string,
@@ -87,7 +87,10 @@ const ForgotPassword: React.FC = () => {
           setStep("verify"); // Move to the OTP verification step
         } else {
           setIsError(true);
-          setMessage("Email not found!");
+          setMessage(data.message);
+          setTimeout(() => {
+            setMessage(null);
+          }, 3000);
         }
         // Clear message after 5 seconds
         setTimeout(() => {
@@ -96,14 +99,14 @@ const ForgotPassword: React.FC = () => {
       } catch (err) {
         setIsError(true);
         setMessage("Email not found!");
-        // Clear message after 5 seconds
+
         setTimeout(() => {
           setMessage("");
         }, 5000);
         console.log("Failed to login. Please try again.", err);
       } finally {
         setLoading(false);
-        setIsError(false);
+      
       }
     },
   });
@@ -154,9 +157,6 @@ const ForgotPassword: React.FC = () => {
     } finally {
       setLoading(false);
     }
-
-    // Here you would typically send the new password to your API
-    console.log("New password:", newPassword);
     setIsError(false);
     setMessage("Password has been reset successfully!");
     // Reset form and states

@@ -24,9 +24,7 @@ const LoginForm: React.FC<ILoginFormProps> = (props) => {
     },
     validationSchema: Yup.object({
       email: Yup.string().email("Invalid email address").required("Required"),
-      password: Yup.string()
-        .required("Required")
-        .min(6, "Password must be at least 6 characters"),
+      password: Yup.string().required("Required"),
     }),
     onSubmit: async (values) => {
       // Add your login logic here

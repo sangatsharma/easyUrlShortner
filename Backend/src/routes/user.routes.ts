@@ -9,6 +9,7 @@ import {
   resendOtpHandler,
   findUserHandler,
   resetPasswordHandler,
+  otpVerificationHandler
 } from "../controllers/user.controller";
 import { validateReferer } from "../middleware/validateReferer";
 import { authenticateJWT } from "../middleware/authenticateJWT";
@@ -20,10 +21,11 @@ router.get("/", (req: Request, res: Response) => {
 });
 router.get("/auth", authenticateJWT, validateUserHandler);
 router.post("/auth/login", validateReferer, loginHandler);
-router.post("/auth/logout", validateReferer, logoutHandler);
+router.get("/auth/logout", validateReferer, logoutHandler);
 router.post("/signup", validateReferer, signupHandler);
 router.delete("/auth/deactivate", validateReferer, deactivateHandler);
-router.post("/verify/", validateReferer, verificationHandler);
+router.post("/verify", validateReferer, verificationHandler);
+router.post("/verifyOtp", validateReferer, otpVerificationHandler);
 router.post("/resendOtp", validateReferer, resendOtpHandler);
 router.post("/auth/reset-password", validateReferer, resetPasswordHandler);
 router.post("/find", validateReferer, findUserHandler);
