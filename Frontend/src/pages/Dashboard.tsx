@@ -7,15 +7,13 @@ interface IDashboardProps {}
 
 const Dashboard: React.FunctionComponent<IDashboardProps> = () => {
   const [links, setLinks] = React.useState<
-    [
-      {
-        originalUrl: string;
-        shortId: string;
-        createdAt: string;
-        expiryDate: string;
-        clicks: number;
-      }
-    ]
+    {
+      originalUrl: string;
+      shortId: string;
+      createdAt: string;
+      expiryDate: string;
+      clicks: number;
+    }[]
   >([
     {
       originalUrl: "",
@@ -53,7 +51,7 @@ const Dashboard: React.FunctionComponent<IDashboardProps> = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 p-2">
       <main className="flex-grow w-full ">
         <UrlShortener />
-        {loading ? <p>Loading...</p> : <UrlTable links={links} />}
+        {loading ? <p className="text-center">Loading...</p> : <UrlTable links={links} setLinks={setLinks} />}
       </main>
     </div>
   );

@@ -2,19 +2,45 @@ import { useEffect, useState } from "react";
 import ShortLinkDisplay from "./ShortLinkDisplay";
 import { getFormattedDate } from "../utils/getFormattedDate";
 import { generateQrCode } from "../utils/generateQrCode";
+import axios from "axios";
 
 interface IUrlTable {
-  links: [
-    {
-      originalUrl: string;
-      shortId: string;
-      createdAt: string;
-      expiryDate: string;
-      clicks: number;
-    }
-  ];
+  links: {
+    originalUrl: string;
+    shortId: string;
+    createdAt: string;
+    expiryDate: string;
+    clicks: number;
+  }[];
+  setLinks: React.Dispatch<React.SetStateAction<{
+    originalUrl: string;
+    shortId: string;
+    createdAt: string;
+    expiryDate: string;
+    clicks: number;
+  }[]>>;
 }
-const UrlTable: React.FunctionComponent<IUrlTable> = ({ links }) => {
+const UrlTable: React.FunctionComponent<IUrlTable> = ({ links, setLinks }) => {
+  const [deleteId, setDeleteId] = useState<string|null>(null);
+  const handleShortUrlDelete = async (id: string) => {
+    try {
+      setDeleteId(id);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_SERVER_URL}/api/shorturl/${id}`,
+        { withCredentials: true }
+      );
+      const data = response.data;
+      console.log(response.data);
+      if (data.success) {
+        setLinks((prevLinks: IUrlTable['links']) => prevLinks.filter((item) => item.shortId !== id));
+      }
+    } catch (err) {
+      console.error("Error fetching URLs:", err);
+    } finally {
+      setDeleteId(null);
+    }
+  };
+
   const [qrLinks, setQrLinks] = useState<(string | undefined)[]>([]);
   // Generate QR code for the given URL
   useEffect(() => {
@@ -31,7 +57,7 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links }) => {
   const downloadQrCode = (url: string | undefined) => {
     if (!url) {
       console.error("Error downloading QR code: URL is undefined");
-      url="https://easyurl.me";
+      url = "https://easyurl.me";
     }
     const link = document.createElement("a");
     link.href = url;
@@ -112,9 +138,9 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links }) => {
                     <div className="flex flex-col gap-2 ">
                       <button
                         className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                        onClick={() => alert(`Deleting ${item.shortId}`)}
+                        onClick={() => handleShortUrlDelete(item.shortId)}
                       >
-                        Delete
+                       {deleteId==item.shortId ? "Deleting..." : "Delete"}
                       </button>
                       <button
                         onClick={() => downloadQrCode(qrLinks[index])}

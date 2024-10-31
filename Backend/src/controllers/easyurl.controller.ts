@@ -41,6 +41,7 @@ export const createUrl = async (
     // Cache the new entry in Redis
     setURLInCache(shortId, originalUrl);
     res.status(201).json({ success: true, url: url, userId: userId });
+    return;
   } catch (error) {
     console.error("Error creating URL:", error);
     res.status(500).json({ success: false, error: "Failed to create URL." });
@@ -83,7 +84,7 @@ export const getUrl = async (
       return;
     }
     console.log("URL dont  exists in cache, fetching from DB:");
-    const url = await easyUrlModel.findOne({ shortId: req.params.id });
+    const url = await easyUrlModel.findOne({ shortId: id });
     if (!url) {
       const referer = req.get("Referer") || "/";
       res.status(404).redirect(`${referer}404`);
@@ -92,6 +93,7 @@ export const getUrl = async (
     // Cache the URL in Redis
     setURLInCache(url.shortId, url.originalUrl);
     res.status(200).redirect(url.originalUrl);
+    return;
   } catch (error) {
     console.error("Error fetching URL:", error);
     res.status(500).json({ error: "Failed to fetch URL." });
@@ -115,6 +117,7 @@ export const deleteUrl = async (
       console.error("Failed to delete URL from cache:", err);
     });
     res.status(200).json({ success: true, message: "Successfully deleted." });
+    return;
   } catch (error) {
     console.error("Error deleting URL:", error);
     res.status(500).json({ success: false, error: "Failed to delete URL." });

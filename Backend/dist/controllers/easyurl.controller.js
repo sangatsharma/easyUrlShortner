@@ -48,6 +48,7 @@ const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Cache the new entry in Redis
         (0, redisCache_1.setURLInCache)(shortId, originalUrl);
         res.status(201).json({ success: true, url: url, userId: userId });
+        return;
     }
     catch (error) {
         console.error("Error creating URL:", error);
@@ -85,7 +86,7 @@ const getUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         console.log("URL dont  exists in cache, fetching from DB:");
-        const url = yield db_model_1.default.findOne({ shortId: req.params.id });
+        const url = yield db_model_1.default.findOne({ shortId: id });
         if (!url) {
             const referer = req.get("Referer") || "/";
             res.status(404).redirect(`${referer}404`);
@@ -94,6 +95,7 @@ const getUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Cache the URL in Redis
         (0, redisCache_1.setURLInCache)(url.shortId, url.originalUrl);
         res.status(200).redirect(url.originalUrl);
+        return;
     }
     catch (error) {
         console.error("Error fetching URL:", error);
@@ -115,6 +117,7 @@ const deleteUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             console.error("Failed to delete URL from cache:", err);
         });
         res.status(200).json({ success: true, message: "Successfully deleted." });
+        return;
     }
     catch (error) {
         console.error("Error deleting URL:", error);
