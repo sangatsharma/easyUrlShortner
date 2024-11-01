@@ -96,17 +96,15 @@ const ForgotPassword: React.FC = () => {
         setTimeout(() => {
           setMessage("");
         }, 5000);
-      } catch (err) {
+      } catch (err: any) {
         setIsError(true);
-        setMessage("Email not found!");
+        setMessage(`Failed to send otp. Please try again: ${err.message}`);
 
         setTimeout(() => {
           setMessage("");
         }, 5000);
-        console.log("Failed to login. Please try again.", err);
       } finally {
         setLoading(false);
-      
       }
     },
   });
@@ -126,7 +124,7 @@ const ForgotPassword: React.FC = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/user/reset-password`,
+        `${import.meta.env.VITE_SERVER_URL}/user/auth/reset-password`,
         {
           email: emailFormik.values.email as string,
           password: newPassword as string,
@@ -149,6 +147,7 @@ const ForgotPassword: React.FC = () => {
         setTimeout(() => {
           setMessage(null);
         }, 3000);
+        return;
       }
     } catch (err) {
       setIsError(true);
@@ -165,7 +164,7 @@ const ForgotPassword: React.FC = () => {
     setOtp("");
     emailFormik.resetForm();
 
-    // Clear message after 5 seconds
+//    Clear message after 5 seconds
     setTimeout(() => {
       setMessage("Redirecting to home page...");
       window.location.href = "/";
