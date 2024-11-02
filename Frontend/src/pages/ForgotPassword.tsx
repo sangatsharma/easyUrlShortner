@@ -164,7 +164,7 @@ const ForgotPassword: React.FC = () => {
     setOtp("");
     emailFormik.resetForm();
 
-//    Clear message after 5 seconds
+    //    Clear message after 5 seconds
     setTimeout(() => {
       setMessage("Redirecting to home page...");
       window.location.href = "/";
@@ -234,6 +234,7 @@ const ForgotPassword: React.FC = () => {
             <ResendOTPButton
               setError={setMessage}
               userEmail={emailFormik.values.email}
+              otpType="reset"
             />
             <button
               disabled={loading}

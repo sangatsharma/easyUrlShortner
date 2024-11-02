@@ -4,7 +4,7 @@ import bcryptjs from "bcryptjs";
 import { generateVerificationToken } from "../utils/generateVerificationToken";
 import { generateAndSetCookie } from "../utils/generateAndSetCookie";
 import { sendOtpEmail } from "../nodemailer/sendVerificationEmail";
-import exp from "constants";
+
 
 export const signupHandler = async (
   req: Request,
@@ -37,7 +37,7 @@ export const signupHandler = async (
       user.emailVerificationToken = emailVerificationToken;
       user.emailVerificationTokenExpiry = emailVerificationTokenExpiry;
       await user.save();
-      await sendOtpEmail(email, emailVerificationToken, "User");
+      await sendOtpEmail(email, emailVerificationToken, "User", "verify");
       res.status(200).json({
         success: true,
         message: "Please verify your email.",
@@ -52,7 +52,7 @@ export const signupHandler = async (
         new Date().getTime() + 10 * 60 * 1000
       ),
     });
-    await sendOtpEmail(email, emailVerificationToken, "User");
+    await sendOtpEmail(email, emailVerificationToken, "User", "verify");
     res.status(200).json({
       success: true,
       message: "Please verify your email.",
@@ -316,7 +316,7 @@ export const resendOtpHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { email } = req.body;
+  const { email,otpType } = req.body;
   if (!email) {
     res.status(200).json({ success: false, message: "Email is required" });
     return;
@@ -333,7 +333,7 @@ export const resendOtpHandler = async (
       new Date().getTime() + 10 * 60 * 1000
     );
     await user.save();
-    await sendOtpEmail(email, otp, user.name);
+    await sendOtpEmail(email, otp, user.name,otpType as string);
     res.status(200).json({
       success: true,
       message: "OTP sent successfully",
@@ -366,7 +366,7 @@ export const findUserHandler = async (
       new Date().getTime() + 10 * 60 * 1000
     );
     await user.save();
-    await sendOtpEmail(email, otp, user.name);
+    await sendOtpEmail(email, otp, user.name,"reset");
     res.status(200).json({
       success: true,
       message: "OTP sent successfully",

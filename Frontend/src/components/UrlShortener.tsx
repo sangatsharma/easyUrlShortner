@@ -61,11 +61,11 @@ const UrlShortener: React.FC = () => {
 
       <form
         onSubmit={handleShorten}
-        className="space-y-4"
+        className="space-y-2"
         aria-labelledby="form-title"
       >
         <label htmlFor="url-input" className="block text-sm font-medium">
-          Enter your full URL:
+          Enter your full URL :
         </label>
         <input
           type="text"

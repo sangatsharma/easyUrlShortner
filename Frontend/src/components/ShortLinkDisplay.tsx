@@ -22,7 +22,7 @@ const ShortLinkDisplay: React.FC<ShortLinkProps> = React.memo(({ shortLink,hide=
   }, [shortLink]);
 
   return (
-    <div className="mt-2 sm:mt-4 flex flex-wrap justify-center items-center">
+    <div className="mt-2 sm:mt-4 flex flex-wrap gap-2 justify-center items-center">
       {/* Hidden meta tag for SEO */}
       {shortLink && (
         <meta name="description" content={`Shortened link: ${shortLink}`} />
@@ -32,6 +32,8 @@ const ShortLinkDisplay: React.FC<ShortLinkProps> = React.memo(({ shortLink,hide=
       <label htmlFor="shortLinkInput" className={`${hide && "hidden"} pr-2`}>
         Shortened URL : {"  "}
       </label>
+<div className='flex'>
+
 
       <input
         id="shortLinkInput"
@@ -50,6 +52,7 @@ const ShortLinkDisplay: React.FC<ShortLinkProps> = React.memo(({ shortLink,hide=
       >
         {copySuccess ? 'Copied!' : 'Copy'}
       </button>
+      </div>
     </div>
   );
 });

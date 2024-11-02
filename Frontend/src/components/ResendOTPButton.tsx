@@ -5,12 +5,14 @@ interface ResendOTPButtonProps {
   initialTime?: number; // Optional prop: countdown time in seconds
   setError: (message: string | null) => void; // Optional prop: callback when OTP is resent
   userEmail: string;
+  otpType: string;
 }
 
 const ResendOTPButton: React.FC<ResendOTPButtonProps> = ({
   initialTime = 120, // Default to 60 seconds if not provided
   setError,
   userEmail,
+  otpType,
 }) => {
   const [timeLeft, setTimeLeft] = useState<number>(initialTime);
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
@@ -40,6 +42,7 @@ const ResendOTPButton: React.FC<ResendOTPButtonProps> = ({
         `${import.meta.env.VITE_SERVER_URL}/user/resendOtp`,
         {
           email: userEmail as string,
+          otpType: otpType,
         },
         {
           withCredentials: true,
