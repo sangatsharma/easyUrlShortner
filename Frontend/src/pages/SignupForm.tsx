@@ -244,6 +244,7 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
           <ResendOTPButton
             setError={setError}
             userEmail={formik.values.email as string}
+            otpType="verify"
           />
           {error && <p className="text-red-500 mt-4">{error}</p>}
           <button
