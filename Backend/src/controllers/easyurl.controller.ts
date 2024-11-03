@@ -137,12 +137,12 @@ export const cronJobExpiryNotifier = async (
     return;
   }
 
-  console.log("Cron job started");
- 
+  console.log("Cron job started: notify expiry");
+
   const today = new Date();
   const expiryDateThreshold = new Date(
-    today.getTime() + 40 * 24 * 60 * 60 * 1000
-  ); // 40 days from today
+    today.getTime() + 3 * 24 * 60 * 60 * 1000
+  ); // 3 days from today
 
   try {
     const expiringUrls = await easyUrlModel.find({
@@ -156,8 +156,8 @@ export const cronJobExpiryNotifier = async (
       const daysLeft = Math.round(
         (url.expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
       );
-      //todo set 40 to 3 days
-      if (daysLeft <= 40) {
+
+      if (daysLeft <= 3) {
         const user = await userModel.findById(url.userId);
 
         if (user) {

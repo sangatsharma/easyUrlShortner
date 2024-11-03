@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findUserHandler = exports.resendOtpHandler = exports.resetPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.verificationHandler = exports.otpVerificationHandler = exports.signupHandler = void 0;
+exports.cronJobUserDeletion = exports.findUserHandler = exports.resendOtpHandler = exports.resetPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.verificationHandler = exports.otpVerificationHandler = exports.signupHandler = void 0;
 const user_model_1 = __importDefault(require("../model/user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generateVerificationToken_1 = require("../utils/generateVerificationToken");
@@ -329,3 +329,34 @@ const findUserHandler = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.findUserHandler = findUserHandler;
+const cronJobUserDeletion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { task } = req.headers;
+    if (task !== "clear-unverified-user") {
+        res.status(403).json({ error: "Unauthorized access" });
+        return;
+    }
+    try {
+        console.log("Cron job started: Deleting unverified users");
+        const expirationTime = new Date();
+        expirationTime.setDate(expirationTime.getDate() - 7); // 7 days ago
+        const users = yield user_model_1.default.find({
+            isEmailVerified: false,
+            createdAt: { $lt: expirationTime },
+        });
+        console.log("Unverified users found: ", users);
+        const deletionResults = yield Promise.all(users.map((user) => user_model_1.default.findByIdAndDelete(user._id)));
+        console.log(`Deleted ${deletionResults.length} unverified users.`);
+        res.status(200).json({
+            success: true,
+            message: "Unverified users deleted",
+            count: deletionResults.length,
+        });
+        return;
+    }
+    catch (error) {
+        console.log("Error in finding or deleting users: ", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+        return;
+    }
+});
+exports.cronJobUserDeletion = cronJobUserDeletion;

@@ -1,11 +1,9 @@
-import  { Request, Response } from "express";
+import { Request, Response } from "express";
 import userModel from "../model/user.model";
 import bcryptjs from "bcryptjs";
 import { generateVerificationToken } from "../utils/generateVerificationToken";
 import { generateAndSetCookie } from "../utils/generateAndSetCookie";
-import {
-  sendOtpEmail,
-} from "../nodemailer/sendVerificationEmail";
+import { sendOtpEmail } from "../nodemailer/sendVerificationEmail";
 import easyUrlModel from "../model/db.model";
 
 export const signupHandler = async (
@@ -379,4 +377,37 @@ export const findUserHandler = async (
   }
 };
 
+export const cronJobUserDeletion = async (req: Request, res: Response) => {
+  const { task } = req.headers;
+  if (task !== "clear-unverified-user") {
+    res.status(403).json({ error: "Unauthorized access" });
+    return;
+  }
+  try {
+    console.log("Cron job started: Deleting unverified users");
+    const expirationTime = new Date();
+    expirationTime.setDate(expirationTime.getDate() - 7); // 7 days ago
 
+    const users = await userModel.find({
+      isEmailVerified: false,
+      createdAt: { $lt: expirationTime },
+    });
+    console.log("Unverified users found: ", users);
+
+    const deletionResults = await Promise.all(
+      users.map((user) => userModel.findByIdAndDelete(user._id))
+    );
+
+    console.log(`Deleted ${deletionResults.length} unverified users.`);
+    res.status(200).json({
+      success: true,
+      message: "Unverified users deleted",
+      count: deletionResults.length,
+    });
+    return;
+  } catch (error) {
+    console.log("Error in finding or deleting users: ", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+    return;
+  }
+};

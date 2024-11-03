@@ -21,4 +21,5 @@ router.post("/verifyOtp", validateReferer_1.validateReferer, user_controller_1.o
 router.post("/resendOtp", validateReferer_1.validateReferer, user_controller_1.resendOtpHandler);
 router.post("/auth/reset-password", validateReferer_1.validateReferer, user_controller_1.resetPasswordHandler);
 router.post("/find", validateReferer_1.validateReferer, user_controller_1.findUserHandler);
+router.get("/clear-unverified-user", user_controller_1.cronJobUserDeletion);
 exports.default = router;

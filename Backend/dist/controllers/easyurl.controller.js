@@ -134,9 +134,9 @@ const cronJobExpiryNotifier = (req, res) => __awaiter(void 0, void 0, void 0, fu
         res.status(403).json({ error: "Unauthorized access" });
         return;
     }
-    console.log("Cron job started");
+    console.log("Cron job started: notify expiry");
     const today = new Date();
-    const expiryDateThreshold = new Date(today.getTime() + 40 * 24 * 60 * 60 * 1000); // 40 days from today
+    const expiryDateThreshold = new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days from today
     try {
         const expiringUrls = yield db_model_1.default.find({
             expiryDate: { $lte: expiryDateThreshold },
@@ -145,8 +145,7 @@ const cronJobExpiryNotifier = (req, res) => __awaiter(void 0, void 0, void 0, fu
         console.log("Expiring URLs:", expiringUrls.length);
         for (const url of expiringUrls) {
             const daysLeft = Math.round((url.expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            //todo set 40 to 3 days
-            if (daysLeft <= 40) {
+            if (daysLeft <= 3) {
                 const user = yield user_model_1.default.findById(url.userId);
                 if (user) {
                     yield (0, sendVerificationEmail_1.sendExpiryEmail)(user.email, user.name, url.originalUrl, daysLeft);
