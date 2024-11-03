@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const easyurl_controller_1 = require("../controllers/easyurl.controller");
 const validateReferer_1 = require("../middleware/validateReferer");
 const getUserIdFromToken_1 = require("../utils/getUserIdFromToken");
+const authenticateJWT_1 = require("../middleware/authenticateJWT");
 const router = express_1.default.Router();
 // Route to create a short URL
 router.post("/api/shortUrl", validateReferer_1.validateReferer, getUserIdFromToken_1.getUserIdFromToken, easyurl_controller_1.createUrl);
@@ -20,5 +21,6 @@ router.get("/api/urls/all", validateReferer_1.validateReferer, getUserIdFromToke
 // Route to get long URL by ID
 router.get("/api/getLongUrl/:id", validateReferer_1.validateReferer, easyurl_controller_1.getUrl);
 // Route to delete a short URL by ID
-router.delete("/api/shorturl/:id", validateReferer_1.validateReferer, easyurl_controller_1.deleteUrl);
+router.delete("/api/shorturl/:id", validateReferer_1.validateReferer, authenticateJWT_1.authenticateJWT, easyurl_controller_1.deleteUrl);
+router.get("/notify-expiry", easyurl_controller_1.cronJobExpiryNotifier);
 exports.default = router;

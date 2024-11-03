@@ -9,8 +9,7 @@ import {
   resendOtpHandler,
   findUserHandler,
   resetPasswordHandler,
-  otpVerificationHandler,
-  cronJobExpiryNotifier
+  otpVerificationHandler
 } from "../controllers/user.controller";
 import { validateReferer } from "../middleware/validateReferer";
 import { authenticateJWT } from "../middleware/authenticateJWT";
@@ -30,6 +29,6 @@ router.post("/verifyOtp", validateReferer, otpVerificationHandler);
 router.post("/resendOtp", validateReferer, resendOtpHandler);
 router.post("/auth/reset-password", validateReferer, resetPasswordHandler);
 router.post("/find", validateReferer, findUserHandler);
-router.get("/notify-expiry", validateReferer, cronJobExpiryNotifier);
+
 
 export default router;

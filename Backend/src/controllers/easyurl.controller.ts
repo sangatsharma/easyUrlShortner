@@ -3,6 +3,8 @@ import { generateUniqueId } from "../utils/generateUniqueId";
 import easyUrlModel from "../model/db.model";
 import { redisClient } from "../config/redisConfig";
 import { getURLFromCache, setURLInCache } from "../utils/redisCache";
+import { sendExpiryEmail } from "../nodemailer/sendVerificationEmail";
+import userModel from "../model/user.model";
 
 //handler to create short url from long url
 export const createUrl = async (
@@ -121,5 +123,65 @@ export const deleteUrl = async (
   } catch (error) {
     console.error("Error deleting URL:", error);
     res.status(500).json({ success: false, error: "Failed to delete URL." });
+  }
+};
+
+export const cronJobExpiryNotifier = async (
+  req: express.Request,
+  res: express.Response
+): Promise<void> => {
+  const { task } = req.headers;
+  console.log("Task:", task);
+  if (task !== "notify-expiry") {
+    res.status(403).json({ error: "Unauthorized access" });
+    return;
+  }
+
+  console.log("Cron job started");
+ 
+  const today = new Date();
+  const expiryDateThreshold = new Date(
+    today.getTime() + 40 * 24 * 60 * 60 * 1000
+  ); // 40 days from today
+
+  try {
+    const expiringUrls = await easyUrlModel.find({
+      expiryDate: { $lte: expiryDateThreshold },
+      expiryNotificationSent: { $ne: true }, // only fetch URLs that haven't been notified
+    });
+
+    console.log("Expiring URLs:", expiringUrls.length);
+
+    for (const url of expiringUrls) {
+      const daysLeft = Math.round(
+        (url.expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      //todo set 40 to 3 days
+      if (daysLeft <= 40) {
+        const user = await userModel.findById(url.userId);
+
+        if (user) {
+          await sendExpiryEmail(
+            user.email,
+            user.name,
+            url.originalUrl,
+            daysLeft
+          );
+
+          // Update the URL document to mark it as notified
+          await easyUrlModel.findByIdAndUpdate(url._id, {
+            expiryNotificationSent: true,
+          });
+        }
+      }
+    }
+
+    console.log(
+      "Checked for expiring links and sent notifications where necessary."
+    );
+    res.status(200).json({ message: "notify expiry cron job completed  " });
+    return;
+  } catch (error) {
+    console.error("Error fetching expiring URLs:", error);
   }
 };

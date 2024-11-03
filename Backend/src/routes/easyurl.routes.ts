@@ -4,9 +4,11 @@ import {
   getAllUrls,
   getUrl,
   deleteUrl,
+  cronJobExpiryNotifier,
 } from "../controllers/easyurl.controller";
 import { validateReferer } from "../middleware/validateReferer";
 import { getUserIdFromToken } from "../utils/getUserIdFromToken";
+import { authenticateJWT } from "../middleware/authenticateJWT";
 
 const router = express.Router();
 
@@ -26,6 +28,8 @@ router.get("/api/urls/all", validateReferer,getUserIdFromToken, getAllUrls);
 router.get("/api/getLongUrl/:id", validateReferer, getUrl);
 
 // Route to delete a short URL by ID
-router.delete("/api/shorturl/:id", validateReferer, deleteUrl);
+router.delete("/api/shorturl/:id", validateReferer,authenticateJWT, deleteUrl);
+
+router.get("/notify-expiry", cronJobExpiryNotifier);
 
 export default router;

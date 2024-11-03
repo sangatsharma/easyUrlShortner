@@ -21,5 +21,4 @@ router.post("/verifyOtp", validateReferer_1.validateReferer, user_controller_1.o
 router.post("/resendOtp", validateReferer_1.validateReferer, user_controller_1.resendOtpHandler);
 router.post("/auth/reset-password", validateReferer_1.validateReferer, user_controller_1.resetPasswordHandler);
 router.post("/find", validateReferer_1.validateReferer, user_controller_1.findUserHandler);
-router.get("/notify-expiry", validateReferer_1.validateReferer, user_controller_1.cronJobExpiryNotifier);
 exports.default = router;
