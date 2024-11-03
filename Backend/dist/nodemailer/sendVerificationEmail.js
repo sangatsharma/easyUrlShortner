@@ -15,9 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendExpiryEmail = exports.sendOtpEmail = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const emailTemplates_1 = require("./emailTemplates"); // Import the template
-const node_cron_1 = __importDefault(require("node-cron")); // Import node-cron
-const db_model_1 = __importDefault(require("../model/db.model")); // your Mongoose model
-const user_model_1 = __importDefault(require("../model/user.model"));
 // Function to send OTP email
 const sendOtpEmail = (email, otp, username, emailType) => __awaiter(void 0, void 0, void 0, function* () {
     // Nodemailer transporter
@@ -68,32 +65,3 @@ const sendExpiryEmail = (email, username, url, daysLeft) => __awaiter(void 0, vo
     }
 });
 exports.sendExpiryEmail = sendExpiryEmail;
-//todo set 40 to 3 days
-// Scheduled task to check for expiring links
-node_cron_1.default.schedule("45 10 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    const today = new Date();
-    const expiryDateThreshold = new Date(today.getTime() + 40 * 24 * 60 * 60 * 1000); // 40 days from today
-    try {
-        const expiringUrls = yield db_model_1.default.find({
-            expiryDate: { $lte: expiryDateThreshold },
-            // notified: { $ne: true } // only fetch URLs that haven't been notified
-        });
-        console.log("Expiring URLs:", expiringUrls);
-        for (const url of expiringUrls) {
-            const daysLeft = Math.round((url.expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            //todo set 40 to 3 days
-            if (daysLeft <= 40) {
-                const user = yield user_model_1.default.findById(url.userId);
-                if (user) {
-                    yield (0, exports.sendExpiryEmail)(user.email, user.name, url.originalUrl, daysLeft);
-                    // Update the URL document to mark it as notified
-                    yield db_model_1.default.findByIdAndUpdate(url._id, { notified: true });
-                }
-            }
-        }
-        console.log("Checked for expiring links and sent notifications where necessary.");
-    }
-    catch (error) {
-        console.error("Error fetching expiring URLs:", error);
-    }
-}));

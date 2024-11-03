@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findUserHandler = exports.resendOtpHandler = exports.resetPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.verificationHandler = exports.otpVerificationHandler = exports.signupHandler = void 0;
+exports.cronJobExpiryNotifier = exports.findUserHandler = exports.resendOtpHandler = exports.resetPasswordHandler = exports.validateUserHandler = exports.deactivateHandler = exports.logoutHandler = exports.loginHandler = exports.verificationHandler = exports.otpVerificationHandler = exports.signupHandler = void 0;
 const user_model_1 = __importDefault(require("../model/user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generateVerificationToken_1 = require("../utils/generateVerificationToken");
 const generateAndSetCookie_1 = require("../utils/generateAndSetCookie");
 const sendVerificationEmail_1 = require("../nodemailer/sendVerificationEmail");
+const db_model_1 = __importDefault(require("../model/db.model"));
 const signupHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     if (!email) {
@@ -329,3 +330,35 @@ const findUserHandler = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.findUserHandler = findUserHandler;
+const cronJobExpiryNotifier = () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Cron job started");
+    //todo implement cron job
+    const today = new Date();
+    const expiryDateThreshold = new Date(today.getTime() + 40 * 24 * 60 * 60 * 1000); // 40 days from today
+    try {
+        const expiringUrls = yield db_model_1.default.find({
+            expiryDate: { $lte: expiryDateThreshold },
+            expiryNotificationSent: { $ne: true }, // only fetch URLs that haven't been notified
+        });
+        console.log("Expiring URLs:", expiringUrls);
+        for (const url of expiringUrls) {
+            const daysLeft = Math.round((url.expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            //todo set 40 to 3 days
+            if (daysLeft <= 40) {
+                const user = yield user_model_1.default.findById(url.userId);
+                if (user) {
+                    yield (0, sendVerificationEmail_1.sendExpiryEmail)(user.email, user.name, url.originalUrl, daysLeft);
+                    // Update the URL document to mark it as notified
+                    yield db_model_1.default.findByIdAndUpdate(url._id, {
+                        expiryNotificationSent: true,
+                    });
+                }
+            }
+        }
+        console.log("Checked for expiring links and sent notifications where necessary.");
+    }
+    catch (error) {
+        console.error("Error fetching expiring URLs:", error);
+    }
+});
+exports.cronJobExpiryNotifier = cronJobExpiryNotifier;

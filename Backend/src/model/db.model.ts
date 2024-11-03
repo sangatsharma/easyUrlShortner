@@ -8,6 +8,7 @@ interface IUrl extends Document {
   createdAt: Date;
   expiryDate: Date;
   userId:mongoose.Schema.Types.ObjectId
+  expiryNotificationSent: boolean;
 }
 
 // Define the schema for URLs with indexes on key fields
@@ -39,6 +40,11 @@ const urlSchema = new mongoose.Schema<IUrl>({
     required: true,
     index: { expireAfterSeconds: 0 }, // TTL index for automatic deletion
   },
+  expiryNotificationSent: {
+    type: Boolean,
+    required: true,
+    default: false,
+  }
 });
 
 // Create the model from the schema

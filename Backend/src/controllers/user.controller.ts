@@ -3,8 +3,11 @@ import userModel from "../model/user.model";
 import bcryptjs from "bcryptjs";
 import { generateVerificationToken } from "../utils/generateVerificationToken";
 import { generateAndSetCookie } from "../utils/generateAndSetCookie";
-import { sendOtpEmail } from "../nodemailer/sendVerificationEmail";
-
+import {
+  sendExpiryEmail,
+  sendOtpEmail,
+} from "../nodemailer/sendVerificationEmail";
+import easyUrlModel from "../model/db.model";
 
 export const signupHandler = async (
   req: Request,
@@ -316,7 +319,7 @@ export const resendOtpHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { email,otpType } = req.body;
+  const { email, otpType } = req.body;
   if (!email) {
     res.status(200).json({ success: false, message: "Email is required" });
     return;
@@ -333,7 +336,7 @@ export const resendOtpHandler = async (
       new Date().getTime() + 10 * 60 * 1000
     );
     await user.save();
-    await sendOtpEmail(email, otp, user.name,otpType as string);
+    await sendOtpEmail(email, otp, user.name, otpType as string);
     res.status(200).json({
       success: true,
       message: "OTP sent successfully",
@@ -366,7 +369,7 @@ export const findUserHandler = async (
       new Date().getTime() + 10 * 60 * 1000
     );
     await user.save();
-    await sendOtpEmail(email, otp, user.name,"reset");
+    await sendOtpEmail(email, otp, user.name, "reset");
     res.status(200).json({
       success: true,
       message: "OTP sent successfully",
@@ -374,5 +377,54 @@ export const findUserHandler = async (
   } catch (error) {
     console.log("Error in finding user: ", error);
     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const cronJobExpiryNotifier = async () => {
+  console.log("Cron job started");
+  //todo implement cron job
+
+  const today = new Date();
+  const expiryDateThreshold = new Date(
+    today.getTime() + 40 * 24 * 60 * 60 * 1000
+  ); // 40 days from today
+
+  try {
+    const expiringUrls = await easyUrlModel.find({
+      expiryDate: { $lte: expiryDateThreshold },
+      expiryNotificationSent: { $ne: true }, // only fetch URLs that haven't been notified
+    });
+
+    console.log("Expiring URLs:", expiringUrls);
+
+    for (const url of expiringUrls) {
+      const daysLeft = Math.round(
+        (url.expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      //todo set 40 to 3 days
+      if (daysLeft <= 40) {
+        const user = await userModel.findById(url.userId);
+
+        if (user) {
+          await sendExpiryEmail(
+            user.email,
+            user.name,
+            url.originalUrl,
+            daysLeft
+          );
+
+          // Update the URL document to mark it as notified
+          await easyUrlModel.findByIdAndUpdate(url._id, {
+            expiryNotificationSent: true,
+          });
+        }
+      }
+    }
+
+    console.log(
+      "Checked for expiring links and sent notifications where necessary."
+    );
+  } catch (error) {
+    console.error("Error fetching expiring URLs:", error);
   }
 };

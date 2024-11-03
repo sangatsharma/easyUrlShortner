@@ -33,6 +33,11 @@ const urlSchema = new mongoose_1.default.Schema({
         required: true,
         index: { expireAfterSeconds: 0 }, // TTL index for automatic deletion
     },
+    expiryNotificationSent: {
+        type: Boolean,
+        required: true,
+        default: false,
+    }
 });
 // Create the model from the schema
 const easyUrlModel = mongoose_1.default.model("easyUrl", urlSchema);
