@@ -330,7 +330,12 @@ const findUserHandler = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.findUserHandler = findUserHandler;
-const cronJobExpiryNotifier = () => __awaiter(void 0, void 0, void 0, function* () {
+const cronJobExpiryNotifier = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { task } = req.headers;
+    if (task !== "notify-expiry") {
+        res.status(403).json({ error: "Unauthorized access" });
+        return;
+    }
     console.log("Cron job started");
     //todo implement cron job
     const today = new Date();
@@ -356,6 +361,8 @@ const cronJobExpiryNotifier = () => __awaiter(void 0, void 0, void 0, function* 
             }
         }
         console.log("Checked for expiring links and sent notifications where necessary.");
+        res.status(200).json({ message: "notify expiry cron job completed  " });
+        return;
     }
     catch (error) {
         console.error("Error fetching expiring URLs:", error);
