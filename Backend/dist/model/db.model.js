@@ -17,7 +17,7 @@ const urlSchema = new mongoose_1.default.Schema({
         unique: true,
         index: true, // Index on originalUrl for faster searches
     },
-    clicks: {
+    uniqueClicks: {
         type: Number,
         required: true,
         default: 0,
@@ -27,7 +27,11 @@ const urlSchema = new mongoose_1.default.Schema({
         required: true,
         default: Date.now,
     },
-    userId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: false },
+    userId: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: "User",
+        required: false,
+    },
     expiryDate: {
         type: Date,
         required: true,
@@ -37,7 +41,7 @@ const urlSchema = new mongoose_1.default.Schema({
         type: Boolean,
         required: true,
         default: false,
-    }
+    },
 });
 // Create the model from the schema
 const easyUrlModel = mongoose_1.default.model("easyUrl", urlSchema);

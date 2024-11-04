@@ -44,7 +44,6 @@ const App: React.FunctionComponent<IAppProps> = () => {
         <PageNotFound isAuthenticated={isAuthenticated} loading={loading} />
       ),
       children: [
-        { path: ":id", element: <RedirectPage /> },
         { path: "/", element: <Homepage /> },
         {
           path: "/login",

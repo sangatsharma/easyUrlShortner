@@ -28,3 +28,12 @@ export const setURLInCache = async (shortId: string, originalURL: string) => {
     });
   }
 };
+
+export const setClickEventInCache = async ( urlId: string, clickEvent: string) => {
+  let isRedisReady = getRedisStatus();
+  if (isRedisReady) {
+    await redisClient.set(urlId, clickEvent, {
+      EX: 3600, // Set the expiration time to 3600 seconds
+    });
+  }
+}

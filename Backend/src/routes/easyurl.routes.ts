@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, RequestHandler, Response } from "express";
 import {
   createUrl,
   getAllUrls,
@@ -22,13 +22,17 @@ router.get("/", (req: Request, res: Response) => {
 });
 
 // Route to get all URLs (secured with validateReferer middleware)
-router.get("/api/urls/all", validateReferer,getUserIdFromToken, getAllUrls);
+router.get("/api/urls/all", validateReferer, getUserIdFromToken, getAllUrls);
 
 // Route to get long URL by ID
-router.get("/api/getLongUrl/:id", validateReferer, getUrl);
+router.get(
+  "/api/getLongUrl/:id/:externalReferer/:location/:deviceType/:visitorId",
+  validateReferer,
+  getUrl
+);
 
 // Route to delete a short URL by ID
-router.delete("/api/shorturl/:id", validateReferer,authenticateJWT, deleteUrl);
+router.delete("/api/shorturl/:id", validateReferer, authenticateJWT, deleteUrl);
 
 router.get("/notify-expiry", cronJobExpiryNotifier);
 

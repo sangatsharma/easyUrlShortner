@@ -4,10 +4,10 @@ import mongoose, { Document } from "mongoose";
 interface IUrl extends Document {
   shortId: string;
   originalUrl: string;
-  clicks: number;
+  uniqueClicks: number;
   createdAt: Date;
   expiryDate: Date;
-  userId:mongoose.Schema.Types.ObjectId
+  userId: mongoose.Schema.Types.ObjectId;
   expiryNotificationSent: boolean;
 }
 
@@ -24,7 +24,7 @@ const urlSchema = new mongoose.Schema<IUrl>({
     unique: true,
     index: true, // Index on originalUrl for faster searches
   },
-  clicks: {
+  uniqueClicks: {
     type: Number,
     required: true,
     default: 0,
@@ -34,7 +34,11 @@ const urlSchema = new mongoose.Schema<IUrl>({
     required: true,
     default: Date.now,
   },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+  },
   expiryDate: {
     type: Date,
     required: true,
@@ -44,7 +48,7 @@ const urlSchema = new mongoose.Schema<IUrl>({
     type: Boolean,
     required: true,
     default: false,
-  }
+  },
 });
 
 // Create the model from the schema

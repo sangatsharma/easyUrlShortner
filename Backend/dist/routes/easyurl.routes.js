@@ -19,7 +19,7 @@ router.get("/", (req, res) => {
 // Route to get all URLs (secured with validateReferer middleware)
 router.get("/api/urls/all", validateReferer_1.validateReferer, getUserIdFromToken_1.getUserIdFromToken, easyurl_controller_1.getAllUrls);
 // Route to get long URL by ID
-router.get("/api/getLongUrl/:id", validateReferer_1.validateReferer, easyurl_controller_1.getUrl);
+router.get("/api/getLongUrl/:id/:externalReferer/:location/:deviceType/:visitorId", validateReferer_1.validateReferer, easyurl_controller_1.getUrl);
 // Route to delete a short URL by ID
 router.delete("/api/shorturl/:id", validateReferer_1.validateReferer, authenticateJWT_1.authenticateJWT, easyurl_controller_1.deleteUrl);
 router.get("/notify-expiry", easyurl_controller_1.cronJobExpiryNotifier);

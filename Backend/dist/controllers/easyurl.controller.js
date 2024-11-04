@@ -19,6 +19,7 @@ const redisConfig_1 = require("../config/redisConfig");
 const redisCache_1 = require("../utils/redisCache");
 const sendVerificationEmail_1 = require("../nodemailer/sendVerificationEmail");
 const user_model_1 = __importDefault(require("../model/user.model"));
+const clickEvent_model_1 = __importDefault(require("../model/clickEvent.model"));
 //handler to create short url from long url
 const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -79,7 +80,67 @@ const getAllUrls = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.getAllUrls = getAllUrls;
 const getUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.params;
+        const { id, deviceType, visitorId } = req.params;
+        const externalReferer = decodeURIComponent(req.params.externalReferer) || null;
+        const location = req.params.location || null;
+        console.log("externalReferer:", externalReferer);
+        if (location) {
+            console.log("city:", location.split("::")[0]);
+            console.log("country:", location.split("::")[1]);
+        }
+        console.log("deviceType", deviceType);
+        console.log("visitorId", visitorId);
+        let newVisitor = false;
+        //check in redis cache
+        const clickEventCache = yield (0, redisCache_1.getURLFromCache)(`clickEvent-${id}`);
+        if (clickEventCache !== "") {
+            const clickEvent = JSON.parse(clickEventCache);
+            if (!clickEvent
+                .map((event) => event.visitorId)
+                .includes(visitorId)) {
+                clickEvent.push({
+                    urlId: id,
+                    externalReferer,
+                    location,
+                    deviceType,
+                    visitorId,
+                });
+                (0, redisCache_1.setClickEventInCache)(`clickEvent-${id}`, JSON.stringify(clickEvent));
+                newVisitor = true;
+            }
+        }
+        else {
+            (0, redisCache_1.setClickEventInCache)(`clickEvent-${id}`, JSON.stringify([
+                {
+                    urlId: id,
+                    externalReferer,
+                    location,
+                    deviceType,
+                    visitorId,
+                },
+            ]));
+            // Create a new click event
+            const clickEvent = new clickEvent_model_1.default({
+                urlId: id,
+                externalReferer,
+                location,
+                deviceType,
+                visitorId,
+            });
+            yield clickEvent.save();
+            newVisitor = true;
+        }
+        if (newVisitor) {
+            const url = yield db_model_1.default.findOne({ shortId: id });
+            if (url) {
+                url.uniqueClicks += 1;
+                yield url.save();
+                res.status(200).redirect(url.originalUrl);
+                const cachedUrl = yield (0, redisCache_1.getURLFromCache)(id);
+                (0, redisCache_1.setURLInCache)(url.shortId, url.originalUrl);
+                return;
+            }
+        }
         // Check Redis cache first
         const cachedUrl = yield (0, redisCache_1.getURLFromCache)(id);
         if (cachedUrl !== "") {
@@ -91,6 +152,7 @@ const getUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const url = yield db_model_1.default.findOne({ shortId: id });
         if (!url) {
             const referer = req.get("Referer") || "/";
+            console.log("URL not found in DB, redirecting to referer:", referer);
             res.status(404).redirect(`${referer}404`);
             return;
         }
@@ -142,7 +204,6 @@ const cronJobExpiryNotifier = (req, res) => __awaiter(void 0, void 0, void 0, fu
             expiryDate: { $lte: expiryDateThreshold },
             expiryNotificationSent: { $ne: true }, // only fetch URLs that haven't been notified
         });
-        console.log("Expiring URLs:", expiringUrls.length);
         for (const url of expiringUrls) {
             const daysLeft = Math.round((url.expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
             if (daysLeft <= 3) {
@@ -157,7 +218,10 @@ const cronJobExpiryNotifier = (req, res) => __awaiter(void 0, void 0, void 0, fu
             }
         }
         console.log("Checked for expiring links and sent notifications where necessary.");
-        res.status(200).json({ message: "notify expiry cron job completed  " });
+        res.status(200).json({
+            message: "notify expiry cron job completed",
+            count: expiringUrls.length,
+        });
         return;
     }
     catch (error) {

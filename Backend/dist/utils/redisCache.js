@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setURLInCache = exports.getURLFromCache = void 0;
+exports.setClickEventInCache = exports.setURLInCache = exports.getURLFromCache = void 0;
 const redisConfig_1 = require("../config/redisConfig");
 const getURLFromCache = (text) => __awaiter(void 0, void 0, void 0, function* () {
     let isRedisReady = (0, redisConfig_1.getRedisStatus)();
@@ -36,3 +36,12 @@ const setURLInCache = (shortId, originalURL) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.setURLInCache = setURLInCache;
+const setClickEventInCache = (urlId, clickEvent) => __awaiter(void 0, void 0, void 0, function* () {
+    let isRedisReady = (0, redisConfig_1.getRedisStatus)();
+    if (isRedisReady) {
+        yield redisConfig_1.redisClient.set(urlId, clickEvent, {
+            EX: 3600, // Set the expiration time to 3600 seconds
+        });
+    }
+});
+exports.setClickEventInCache = setClickEventInCache;
