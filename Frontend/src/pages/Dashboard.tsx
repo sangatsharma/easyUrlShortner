@@ -8,7 +8,7 @@ import { fetchLinks } from "../store/linkSlice";
 
 const Dashboard: React.FunctionComponent = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { links, loading } = useSelector((state:RootState) => state.links);
+  const { loading } = useSelector((state: RootState) => state.links);
 
   React.useEffect(() => {
     dispatch(fetchLinks());
@@ -18,11 +18,7 @@ const Dashboard: React.FunctionComponent = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 p-2">
       <main className="flex-grow w-full ">
         <UrlShortener />
-        {loading ? (
-          <p className="text-center">Loading...</p>
-        ) : (
-          <UrlTable />
-        )}
+        {loading ? <p className="text-center">Loading...</p> : <UrlTable />}
       </main>
     </div>
   );
