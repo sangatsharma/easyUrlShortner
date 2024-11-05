@@ -3,12 +3,16 @@ import axios from "axios";
 
 import { isValidUrl } from "../utils/validUrlChecker.ts";
 import ShortLinkDisplay from "./ShortLinkDisplay.tsx";
-
+import { AppDispatch } from "../store/store.ts";
+import { useDispatch } from "react-redux";
+import { addLink } from "../store/linkSlice.ts";
 
 const UrlShortener: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const [url, setUrl] = useState<string>("");
   const [shortLink, setShortLink] = useState<string | null>(null);
-  const [allLinks, setAllLinks] = useState<string[]>([]);
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,15 +42,16 @@ const UrlShortener: React.FC = () => {
 
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/api/shortUrl`,
-        { originalUrl: formattedUrl },{withCredentials: true}
+        { originalUrl: formattedUrl },
+        { withCredentials: true }
       );
       console.log(response.data);
       setShortLink(`easyurl.me/${response.data.url.shortId}`);
-      setAllLinks([
-        ...allLinks,
-        `https://easyurl.me/${response.data.url.shortId}`,
-      ]);
+     if(response.data.url.originalUrl){
+      dispatch(addLink(response.data.url));
+     }
     } catch (err) {
+      console.log(err);
       setError("Failed to shorten the URL. Please try again.");
     } finally {
       setLoading(false);

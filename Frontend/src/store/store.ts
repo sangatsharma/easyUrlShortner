@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './authSlice';
+import linksReducer from './linkSlice';
 
 // Configure the Redux store with the authentication reducer
 const store = configureStore({
   reducer: {
     auth: authReducer,
+    links: linksReducer,
   },
 });
 

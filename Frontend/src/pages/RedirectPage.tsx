@@ -14,6 +14,7 @@ const RedirectPage: React.FC = () => {
     city: string | null;
     country: string | null;
   }>({ city: null, country: null });
+  const [visitorId, setVisitorId] = useState<string | null>(null);
 
   const getIpLocation = async () => {
     try {
@@ -30,16 +31,33 @@ const RedirectPage: React.FC = () => {
       setLocation({ city: "unknown", country: "unknown" });
     }
   };
+  const visitorIdSetup = () => {
+    // Check if the user is new or returning
+    let visitorId = getUserCookie();
+    if (!visitorId) {
+      visitorId = generateUniqueId(); // Generate a new visitor ID
+      setUserCookie(visitorId);
+      setVisitorId(visitorId);
+      console.log("New user identified with ID:", visitorId);
+    } else {
+      setVisitorId(visitorId);
+      console.log("Returning user identified with ID:", visitorId);
+    }
+  };
 
   useEffect(() => {
     if (id !== undefined) {
       getIpLocation();
     }
+    if (visitorId === null) {
+      visitorIdSetup();
+    }
   }, [id]);
 
   useEffect(() => {
+    console.log("Referrer", document.referrer);
     // Wait until the location is fetched before redirecting
-    if (location.city !== null) {
+    if (location.city !== null && visitorId) {
       const referrerSource = encodeURIComponent(
         document.referrer || window.location.hostname
       );
@@ -53,23 +71,13 @@ const RedirectPage: React.FC = () => {
         location.city || "Unknown"
       )}::${encodeURIComponent(location.country || "Unknown")}`;
 
-      // Check if the user is new or returning
-      let visitorId = getUserCookie();
-      if (!visitorId) {
-        visitorId = generateUniqueId(); // Generate a new visitor ID
-        setUserCookie(visitorId);
-        console.log("New user identified with ID:", visitorId);
-      } else {
-        console.log("Returning user identified with ID:", visitorId);
-      }
-
       const redirectUrl = `${
         import.meta.env.VITE_SERVER_URL
-      }/api/getLongUrl/${id}/${referrerSource}/${locString}/${deviceType}/${visitorId}`;
-
+      }/api/getLongUrl/${id}/${referrerSource}/${locString}/${deviceType}/${visitorId.toString()}`;
+      console.log("Redirecting to:", redirectUrl);
       window.location.href = redirectUrl;
     }
-  }, [location, id]);
+  }, [location, id, visitorId]);
 
   return <></>; // Component does not render anything
 };

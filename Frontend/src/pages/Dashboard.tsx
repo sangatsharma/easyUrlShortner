@@ -1,57 +1,28 @@
+// src/pages/Dashboard.tsx
 import * as React from "react";
 import UrlShortener from "../components/UrlShortener";
 import UrlTable from "../components/URLtable";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store/store.ts";
+import { fetchLinks } from "../store/linkSlice";
 
-interface IDashboardProps {}
+const Dashboard: React.FunctionComponent = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { links, loading } = useSelector((state:RootState) => state.links);
 
-const Dashboard: React.FunctionComponent<IDashboardProps> = () => {
-  const [links, setLinks] = React.useState<
-    {
-      originalUrl: string;
-      shortId: string;
-      createdAt: string;
-      expiryDate: string;
-      clicks: number;
-    }[]
-  >([
-    {
-      originalUrl: "",
-      shortId: "",
-      createdAt: "",
-      expiryDate: "",
-      clicks: 0,
-    },
-  ]);
-
-  const [loading, setLoading] = React.useState<boolean>(false);
   React.useEffect(() => {
-    fetchLinks();
-  }, []);
-  const fetchLinks = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/api/urls/all`,
-        { withCredentials: true }
-      );
-      const data = response.data;
-      console.log(response.data);
-      if (data.success) {
-        setLinks(response.data.urls);
-      }
-    } catch (err) {
-      console.error("Error fetching URLs:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    dispatch(fetchLinks());
+  }, [dispatch]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 p-2">
       <main className="flex-grow w-full ">
         <UrlShortener />
-        {loading ? <p className="text-center">Loading...</p> : <UrlTable links={links} setLinks={setLinks} />}
+        {loading ? (
+          <p className="text-center">Loading...</p>
+        ) : (
+          <UrlTable />
+        )}
       </main>
     </div>
   );

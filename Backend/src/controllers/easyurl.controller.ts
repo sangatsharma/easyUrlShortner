@@ -2,14 +2,10 @@ import express from "express";
 import { generateUniqueId } from "../utils/generateUniqueId";
 import easyUrlModel from "../model/db.model";
 import { redisClient } from "../config/redisConfig";
-import {
-  getURLFromCache,
-  setClickEventInCache,
-  setURLInCache,
-} from "../utils/redisCache";
+import { getURLFromCache, setURLInCache } from "../utils/redisCache";
 import { sendExpiryEmail } from "../nodemailer/sendVerificationEmail";
 import userModel from "../model/user.model";
-import ClickEvent from "../model/clickEvent.model";
+import { handleUniqueVisitor } from "../utils/handleUniqueVisitor";
 
 //handler to create short url from long url
 export const createUrl = async (
@@ -46,7 +42,7 @@ export const createUrl = async (
     });
 
     // Cache the new entry in Redis
-    setURLInCache(shortId, originalUrl);
+    setURLInCache(shortId, JSON.stringify(url));
     res.status(201).json({ success: true, url: url, userId: userId });
     return;
   } catch (error) {
@@ -83,8 +79,8 @@ export const getUrl = async (
   try {
     const { id, deviceType, visitorId } = req.params;
     const externalReferer =
-      decodeURIComponent(req.params.externalReferer) || null;
-    const location = req.params.location || null;
+      decodeURIComponent(req.params.externalReferer) || "none";
+    const location = req.params.location || "unknown";
     console.log("externalReferer:", externalReferer);
     if (location) {
       console.log("city:", location.split("::")[0]);
@@ -92,89 +88,42 @@ export const getUrl = async (
     }
     console.log("deviceType", deviceType);
     console.log("visitorId", visitorId);
-    let newVisitor = false;
-    //check in redis cache
-    const clickEventCache = await getURLFromCache(`clickEvent-${id}`);
-    if (clickEventCache !== "") {
-      const clickEvent = JSON.parse(clickEventCache);
-      if (
-        !clickEvent
-          .map(
-            (event: {
-              urlId: string;
-              externalReferer: string;
-              location: string;
-              deviceType: string;
-              visitorId: string;
-            }) => event.visitorId
-          )
-          .includes(visitorId)
-      ) {
-        clickEvent.push({
-          urlId: id,
-          externalReferer,
-          location,
-          deviceType,
-          visitorId,
-        });
-        setClickEventInCache(`clickEvent-${id}`, JSON.stringify(clickEvent));
-        newVisitor = true;
-      }
-    } else {
-      setClickEventInCache(
-        `clickEvent-${id}`,
-        JSON.stringify([
-          {
-            urlId: id,
-            externalReferer,
-            location,
-            deviceType,
-            visitorId,
-          },
-        ])
-      );
-      // Create a new click event
-      const clickEvent = new ClickEvent({
-        urlId: id,
-        externalReferer,
-        location,
-        deviceType,
-        visitorId,
-      });
-      await clickEvent.save();
-      newVisitor = true;
-    }
 
-    if (newVisitor) {
-      const url = await easyUrlModel.findOne({ shortId: id });
-      if (url) {
-        url.uniqueClicks += 1;
-        await url.save();
-        res.status(200).redirect(url.originalUrl);
-        const cachedUrl = await getURLFromCache(id);
-        setURLInCache(url.shortId, url.originalUrl);
+    // Check Redis cache first for userId
+    const cachedUrl = await getURLFromCache(id);
+    const newVisitor = await handleUniqueVisitor(
+      id,
+      externalReferer,
+      location,
+      deviceType,
+      visitorId
+    );
+    console.log("cachedUrl:", cachedUrl);
+    if (cachedUrl !== "") {
+      if (!cachedUrl.userId || !newVisitor) {
+        console.log("Redirecting URL found in cache:", cachedUrl.originalUrl);
+        res.status(200).redirect(cachedUrl.originalUrl);
         return;
       }
     }
-    // Check Redis cache first
-    const cachedUrl = await getURLFromCache(id);
-    if (cachedUrl !== "") {
-      console.log("getting url from :", cachedUrl);
-      res.status(200).redirect(cachedUrl);
+    if (newVisitor) {
+      console.log("Redirecting new visitor to URL:", newVisitor.originalUrl);
+      res.status(200).redirect(newVisitor.originalUrl);
       return;
     }
-    console.log("URL dont  exists in cache, fetching from DB:");
+    //if cache miss, fetch from db and update cache
     const url = await easyUrlModel.findOne({ shortId: id });
-    if (!url) {
+    console.log("checking URL from DB:");
+    if (url) {
+      res.status(200).redirect(url.originalUrl);
+      setURLInCache(url.shortId, JSON.stringify(url));
+      return;
+    } else {
       const referer = req.get("Referer") || "/";
       console.log("URL not found in DB, redirecting to referer:", referer);
       res.status(404).redirect(`${referer}404`);
       return;
     }
-    // Cache the URL in Redis
-    setURLInCache(url.shortId, url.originalUrl);
-    res.status(200).redirect(url.originalUrl);
-    return;
   } catch (error) {
     console.error("Error fetching URL:", error);
     res.status(500).json({ error: "Failed to fetch URL." });

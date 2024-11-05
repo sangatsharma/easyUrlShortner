@@ -19,7 +19,7 @@ const redisConfig_1 = require("../config/redisConfig");
 const redisCache_1 = require("../utils/redisCache");
 const sendVerificationEmail_1 = require("../nodemailer/sendVerificationEmail");
 const user_model_1 = __importDefault(require("../model/user.model"));
-const clickEvent_model_1 = __importDefault(require("../model/clickEvent.model"));
+const handleUniqueVisitor_1 = require("../utils/handleUniqueVisitor");
 //handler to create short url from long url
 const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -49,7 +49,7 @@ const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             expiryDate: expiryDate,
         });
         // Cache the new entry in Redis
-        (0, redisCache_1.setURLInCache)(shortId, originalUrl);
+        (0, redisCache_1.setURLInCache)(shortId, JSON.stringify(url));
         res.status(201).json({ success: true, url: url, userId: userId });
         return;
     }
@@ -81,8 +81,8 @@ exports.getAllUrls = getAllUrls;
 const getUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id, deviceType, visitorId } = req.params;
-        const externalReferer = decodeURIComponent(req.params.externalReferer) || null;
-        const location = req.params.location || null;
+        const externalReferer = decodeURIComponent(req.params.externalReferer) || "none";
+        const location = req.params.location || "unknown";
         console.log("externalReferer:", externalReferer);
         if (location) {
             console.log("city:", location.split("::")[0]);
@@ -90,76 +90,36 @@ const getUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         console.log("deviceType", deviceType);
         console.log("visitorId", visitorId);
-        let newVisitor = false;
-        //check in redis cache
-        const clickEventCache = yield (0, redisCache_1.getURLFromCache)(`clickEvent-${id}`);
-        if (clickEventCache !== "") {
-            const clickEvent = JSON.parse(clickEventCache);
-            if (!clickEvent
-                .map((event) => event.visitorId)
-                .includes(visitorId)) {
-                clickEvent.push({
-                    urlId: id,
-                    externalReferer,
-                    location,
-                    deviceType,
-                    visitorId,
-                });
-                (0, redisCache_1.setClickEventInCache)(`clickEvent-${id}`, JSON.stringify(clickEvent));
-                newVisitor = true;
-            }
-        }
-        else {
-            (0, redisCache_1.setClickEventInCache)(`clickEvent-${id}`, JSON.stringify([
-                {
-                    urlId: id,
-                    externalReferer,
-                    location,
-                    deviceType,
-                    visitorId,
-                },
-            ]));
-            // Create a new click event
-            const clickEvent = new clickEvent_model_1.default({
-                urlId: id,
-                externalReferer,
-                location,
-                deviceType,
-                visitorId,
-            });
-            yield clickEvent.save();
-            newVisitor = true;
-        }
-        if (newVisitor) {
-            const url = yield db_model_1.default.findOne({ shortId: id });
-            if (url) {
-                url.uniqueClicks += 1;
-                yield url.save();
-                res.status(200).redirect(url.originalUrl);
-                const cachedUrl = yield (0, redisCache_1.getURLFromCache)(id);
-                (0, redisCache_1.setURLInCache)(url.shortId, url.originalUrl);
+        // Check Redis cache first for userId
+        const cachedUrl = yield (0, redisCache_1.getURLFromCache)(id);
+        const newVisitor = yield (0, handleUniqueVisitor_1.handleUniqueVisitor)(id, externalReferer, location, deviceType, visitorId);
+        console.log("cachedUrl:", cachedUrl);
+        if (cachedUrl !== "") {
+            if (!cachedUrl.userId || !newVisitor) {
+                console.log("Redirecting URL found in cache:", cachedUrl.originalUrl);
+                res.status(200).redirect(cachedUrl.originalUrl);
                 return;
             }
         }
-        // Check Redis cache first
-        const cachedUrl = yield (0, redisCache_1.getURLFromCache)(id);
-        if (cachedUrl !== "") {
-            console.log("getting url from :", cachedUrl);
-            res.status(200).redirect(cachedUrl);
+        if (newVisitor) {
+            console.log("Redirecting new visitor to URL:", newVisitor.originalUrl);
+            res.status(200).redirect(newVisitor.originalUrl);
             return;
         }
-        console.log("URL dont  exists in cache, fetching from DB:");
+        //if cache miss, fetch from db and update cache
         const url = yield db_model_1.default.findOne({ shortId: id });
-        if (!url) {
+        console.log("checking URL from DB:");
+        if (url) {
+            res.status(200).redirect(url.originalUrl);
+            (0, redisCache_1.setURLInCache)(url.shortId, JSON.stringify(url));
+            return;
+        }
+        else {
             const referer = req.get("Referer") || "/";
             console.log("URL not found in DB, redirecting to referer:", referer);
             res.status(404).redirect(`${referer}404`);
             return;
         }
-        // Cache the URL in Redis
-        (0, redisCache_1.setURLInCache)(url.shortId, url.originalUrl);
-        res.status(200).redirect(url.originalUrl);
-        return;
     }
     catch (error) {
         console.error("Error fetching URL:", error);

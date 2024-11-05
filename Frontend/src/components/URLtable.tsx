@@ -3,25 +3,18 @@ import ShortLinkDisplay from "./ShortLinkDisplay";
 import { getFormattedDate } from "../utils/getFormattedDate";
 import { generateQrCode } from "../utils/generateQrCode";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store/store";
+import { deleteLink } from "../store/linkSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
-interface IUrlTable {
-  links: {
-    originalUrl: string;
-    shortId: string;
-    createdAt: string;
-    expiryDate: string;
-    clicks: number;
-  }[];
-  setLinks: React.Dispatch<React.SetStateAction<{
-    originalUrl: string;
-    shortId: string;
-    createdAt: string;
-    expiryDate: string;
-    clicks: number;
-  }[]>>;
-}
-const UrlTable: React.FunctionComponent<IUrlTable> = ({ links, setLinks }) => {
-  const [deleteId, setDeleteId] = useState<string|null>(null);
+
+const UrlTable: React.FunctionComponent = () => {
+  const { links, loading } = useSelector((state:RootState) => state.links);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const handleShortUrlDelete = async (id: string) => {
     try {
       setDeleteId(id);
@@ -32,7 +25,7 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links, setLinks }) => {
       const data = response.data;
       console.log(response.data);
       if (data.success) {
-        setLinks((prevLinks: IUrlTable['links']) => prevLinks.filter((item) => item.shortId !== id));
+        dispatch(deleteLink(id));
       }
     } catch (err) {
       console.error("Error fetching URLs:", err);
@@ -71,6 +64,7 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links, setLinks }) => {
         URL Shortener Records
       </h1>
       <div className="overflow-x-auto">
+        {loading && <p className="text-center">Loading...</p>}
         <table className="w-full  border-collapse border border-gray-300 shadow-lg">
           <thead>
             <tr className="bg-blue-600 text-white">
@@ -132,7 +126,7 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links, setLinks }) => {
                     />
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-center">
-                    {item.clicks}
+                    {item.uniqueClicks}
                   </td>
                   <td className="border border-gray-300 px-2 py-2 text-center  ">
                     <div className="flex flex-col gap-2 ">
@@ -140,7 +134,7 @@ const UrlTable: React.FunctionComponent<IUrlTable> = ({ links, setLinks }) => {
                         className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                         onClick={() => handleShortUrlDelete(item.shortId)}
                       >
-                       {deleteId==item.shortId ? "Deleting..." : "Delete"}
+                        {deleteId == item.shortId ? "Deleting..." : "Delete"}
                       </button>
                       <button
                         onClick={() => downloadQrCode(qrLinks[index])}

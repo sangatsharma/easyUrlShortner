@@ -18,6 +18,9 @@ const getURLFromCache = (text) => __awaiter(void 0, void 0, void 0, function* ()
         const value = yield redisConfig_1.redisClient.get(text);
         if (value) {
             console.log(`Got value: ${value}`);
+            if (value.includes("originalUrl")) {
+                return JSON.parse(value);
+            }
             return value;
         }
     }
@@ -30,7 +33,8 @@ const setURLInCache = (shortId, originalURL) => __awaiter(void 0, void 0, void 0
         yield redisConfig_1.redisClient.set(shortId, originalURL, {
             EX: 3600, // Set the expiration time to 3600 seconds
         });
-        yield redisConfig_1.redisClient.set(originalURL, shortId, {
+        const longUrl = JSON.parse(originalURL);
+        yield redisConfig_1.redisClient.set(longUrl.originalUrl, shortId, {
             EX: 3600, // Set the expiration time to 3600 seconds
         });
     }

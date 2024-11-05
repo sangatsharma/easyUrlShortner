@@ -1,15 +1,16 @@
-import {
-  getRedisStatus,
-  redisClient,
-} from "../config/redisConfig";
+import { getRedisStatus, redisClient } from "../config/redisConfig";
 
 export const getURLFromCache = async (text: string) => {
   let isRedisReady = getRedisStatus();
   console.log("Redis connected:", isRedisReady);
   if (isRedisReady) {
     const value = await redisClient.get(text);
+
     if (value) {
       console.log(`Got value: ${value}`);
+      if (value.includes("originalUrl")) {
+        return JSON.parse(value);
+      }
       return value;
     }
   }
@@ -23,17 +24,21 @@ export const setURLInCache = async (shortId: string, originalURL: string) => {
     await redisClient.set(shortId, originalURL, {
       EX: 3600, // Set the expiration time to 3600 seconds
     });
-    await redisClient.set(originalURL, shortId, {
+    const longUrl = JSON.parse(originalURL);
+    await redisClient.set(longUrl.originalUrl, shortId, {
       EX: 3600, // Set the expiration time to 3600 seconds
     });
   }
 };
 
-export const setClickEventInCache = async ( urlId: string, clickEvent: string) => {
+export const setClickEventInCache = async (
+  urlId: string,
+  clickEvent: string
+) => {
   let isRedisReady = getRedisStatus();
   if (isRedisReady) {
     await redisClient.set(urlId, clickEvent, {
       EX: 3600, // Set the expiration time to 3600 seconds
     });
   }
-}
+};
