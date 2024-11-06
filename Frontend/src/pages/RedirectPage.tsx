@@ -61,11 +61,24 @@ const RedirectPage: React.FC = () => {
       const referrerSource = encodeURIComponent(
         document.referrer || window.location.hostname
       );
-      const deviceType = navigator.userAgent.match(
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-      )
-        ? "Mobile"
-        : "Desktop";
+      // Detect device type
+      const userAgent = navigator.userAgent;
+      let deviceType = "Unknown";
+
+      // Detect device type from user agent
+      if (/Android/i.test(userAgent)) {
+        deviceType = "Android";
+      } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
+        deviceType = "iOS";
+      } else if (/Macintosh/i.test(userAgent)) {
+        deviceType = "Mac";
+      } else if (/Windows NT/i.test(userAgent)) {
+        deviceType = "Windows";
+      } else if (/Linux/i.test(userAgent) && !/Android/i.test(userAgent)) {
+        deviceType = "Linux";
+      } else if (/webOS/i.test(userAgent)) {
+        deviceType = "webOS";
+      }
       console.log("Device type:", deviceType);
       const locString = `${encodeURIComponent(
         location.city || "Unknown"
@@ -75,7 +88,7 @@ const RedirectPage: React.FC = () => {
         import.meta.env.VITE_SERVER_URL
       }/api/getLongUrl/${id}/${referrerSource}/${locString}/${deviceType}/${visitorId.toString()}`;
       console.log("Redirecting to:", redirectUrl);
-      window.location.href = redirectUrl;
+       window.location.href = redirectUrl;
     }
   }, [location, id, visitorId]);
 
