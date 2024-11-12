@@ -5,17 +5,15 @@ import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import ResendOTPButton from "../components/ResendOTPButton";
+import { Helmet } from "react-helmet-async";
 
 interface ISignupFormProps {
   isAuthenticated: boolean;
   loading: boolean;
 }
 
-
-
 const SignupForm: React.FC<ISignupFormProps> = (props) => {
-
-  if(!props.loading && props.isAuthenticated){
+  if (!props.loading && props.isAuthenticated) {
     window.location.href = "/dashboard";
   }
   const [loading, setLoading] = useState<boolean>(false);
@@ -33,7 +31,6 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
     }
     try {
       setLoading(true);
-      console.log(formik.values.email, otp);
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/user/verify`,
         {
@@ -47,7 +44,6 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
         }
       );
       const data = response.data;
-      console.log(data);
       if (data.success) {
         window.location.href = "/dashboard";
       } else {
@@ -57,7 +53,7 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
         }, 3000);
       }
     } catch (err) {
-      console.log("Failed to login. Please try again.", err);
+      console.log("Failed to Signup. Please try again.", err);
     } finally {
       setLoading(false);
     }
@@ -88,15 +84,10 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
         setLoading(true);
         const response = await axios.post(
           `${import.meta.env.VITE_SERVER_URL}/user/signup`,
-          {
-            email: values.email as string,
-          },
-          {
-            withCredentials: true,
-          }
+          { email: values.email as string },
+          { withCredentials: true }
         );
         const data = response.data;
-        console.log(data);
         if (data.success) {
           setError(data.message);
           setFormType("otp");
@@ -119,9 +110,19 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
 
   return (
     <div className="flex h-screen justify-center items-center bg-gray-100">
+      <Helmet>
+        <title>Sign Up - EasyURL</title>
+      </Helmet>
+
       {formType === "signup" ? (
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-          <h1 className="text-2xl font-bold mb-6 text-center">Sign Up</h1>
+        <div
+          className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm"
+          role="form"
+          aria-labelledby="signup-form"
+        >
+          <h1 id="signup-form" className="text-2xl font-bold mb-6 text-center">
+            Sign Up
+          </h1>
           <form onSubmit={formik.handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="name" className="block mb-2 text-lg">
@@ -130,6 +131,8 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
               <input
                 id="name"
                 type="text"
+                aria-required="true"
+                aria-describedby="name-error"
                 {...formik.getFieldProps("name")}
                 className={`border p-3 rounded w-full ${
                   formik.touched.name && formik.errors.name
@@ -138,10 +141,13 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
                 }`}
                 placeholder="Name"
               />
-              {formik.touched.name && formik.errors.name ? (
-                <div className="text-red-500 text-sm">{formik.errors.name}</div>
-              ) : null}
+              {formik.touched.name && formik.errors.name && (
+                <div id="name-error" className="text-red-500 text-sm">
+                  {formik.errors.name}
+                </div>
+              )}
             </div>
+
             <div>
               <label htmlFor="email" className="block mb-2 text-lg">
                 Email
@@ -149,6 +155,8 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
               <input
                 id="email"
                 type="email"
+                aria-required="true"
+                aria-describedby="email-error"
                 {...formik.getFieldProps("email")}
                 className={`border p-3 rounded w-full ${
                   formik.touched.email && formik.errors.email
@@ -157,12 +165,13 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
                 }`}
                 placeholder="Email"
               />
-              {formik.touched.email && formik.errors.email ? (
-                <div className="text-red-500 text-sm">
+              {formik.touched.email && formik.errors.email && (
+                <div id="email-error" className="text-red-500 text-sm">
                   {formik.errors.email}
                 </div>
-              ) : null}
+              )}
             </div>
+
             <div>
               <label htmlFor="password" className="block mb-2 text-lg">
                 Password
@@ -170,6 +179,8 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
               <input
                 id="password"
                 type="password"
+                aria-required="true"
+                aria-describedby="password-error"
                 {...formik.getFieldProps("password")}
                 className={`border p-3 rounded w-full ${
                   formik.touched.password && formik.errors.password
@@ -178,12 +189,13 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
                 }`}
                 placeholder="Password"
               />
-              {formik.touched.password && formik.errors.password ? (
-                <div className="text-red-500 text-sm">
+              {formik.touched.password && formik.errors.password && (
+                <div id="password-error" className="text-red-500 text-sm">
                   {formik.errors.password}
                 </div>
-              ) : null}
+              )}
             </div>
+
             <div>
               <label htmlFor="confirmPassword" className="block mb-2 text-lg">
                 Confirm Password
@@ -191,6 +203,8 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
               <input
                 id="confirmPassword"
                 type="password"
+                aria-required="true"
+                aria-describedby="confirm-password-error"
                 {...formik.getFieldProps("confirmPassword")}
                 className={`border p-3 rounded w-full ${
                   formik.touched.confirmPassword &&
@@ -201,16 +215,25 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
                 placeholder="Confirm Password"
               />
               {formik.touched.confirmPassword &&
-              formik.errors.confirmPassword ? (
-                <div className="text-red-500 text-sm">
-                  {formik.errors.confirmPassword}
-                </div>
-              ) : null}
+                formik.errors.confirmPassword && (
+                  <div
+                    id="confirm-password-error"
+                    className="text-red-500 text-sm"
+                  >
+                    {formik.errors.confirmPassword}
+                  </div>
+                )}
             </div>
-            {error && <p className="text-red-500 mt-4">{error}</p>}
+
+            {error && (
+              <p className="text-red-500 mt-4" role="alert">
+                {error}
+              </p>
+            )}
             <button
               type="submit"
               className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200"
+              aria-busy={loading}
             >
               {loading ? "Signing up..." : "Sign Up"}
             </button>
@@ -226,27 +249,33 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
           </div>
         </div>
       ) : (
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-          <div>
-            <label htmlFor="otp" className="block mb-2 text-lg">
-              Enter OTP sent to your email
-            </label>
-            <input
-              required
-              id="otp"
-              type="text"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="border p-3 rounded w-full"
-              placeholder="OTP"
-            />
-          </div>
+        <div
+          className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm"
+          role="form"
+          aria-labelledby="otp-form"
+        >
+          <h1 id="otp-form" className="text-xl mb-4">
+            OTP Verification
+          </h1>
+          <input
+            id="otp"
+            type="text"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            className="border p-3 rounded w-full"
+            aria-required="true"
+            placeholder="Enter OTP"
+          />
           <ResendOTPButton
             setError={setError}
             userEmail={formik.values.email as string}
             otpType="verify"
           />
-          {error && <p className="text-red-500 mt-4">{error}</p>}
+          {error && (
+            <p className="text-red-500 mt-4" role="alert">
+              {error}
+            </p>
+          )}
           <button
             onClick={handleOtpVerification}
             className="bg-blue-500 mt-4 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200"

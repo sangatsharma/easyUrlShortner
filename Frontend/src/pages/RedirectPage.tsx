@@ -2,6 +2,7 @@ import * as React from "react";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Helmet } from "react-helmet-async";
 import {
   generateUniqueId,
   getUserCookie,
@@ -31,6 +32,7 @@ const RedirectPage: React.FC = () => {
       setLocation({ city: "unknown", country: "unknown" });
     }
   };
+
   const visitorIdSetup = () => {
     // Check if the user is new or returning
     let visitorId = getUserCookie();
@@ -56,6 +58,7 @@ const RedirectPage: React.FC = () => {
 
   useEffect(() => {
     console.log("Referrer", document.referrer);
+
     // Wait until the location is fetched before redirecting
     if (location.city !== null && visitorId) {
       const referrerSource = encodeURIComponent(
@@ -88,11 +91,41 @@ const RedirectPage: React.FC = () => {
         import.meta.env.VITE_SERVER_URL
       }/api/getLongUrl/${id}/${referrerSource}/${locString}/${deviceType}/${visitorId.toString()}`;
       console.log("Redirecting to:", redirectUrl);
-       window.location.href = redirectUrl;
+
+      // Make the actual redirect
+      window.location.href = redirectUrl;
     }
   }, [location, id, visitorId]);
 
-  return <></>; // Component does not render anything
+  return (
+    <>
+      {/* Helmet for SEO optimization */}
+      <Helmet>
+        <title>Redirecting...</title>
+        <meta name="description" content="Redirecting to your destination based on your location and device. Please wait." />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href={`https://www.easyurl.me/${id}`} />
+        {/* Open Graph Tags */}
+        <meta property="og:title" content="Redirecting to Your Destination" />
+        <meta property="og:description" content="You are being redirected based on your location and device." />
+        <meta property="og:url" content={`https://www.easyurl.me/${id}`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://www.easyurl.me/images/og-image.jpg" />
+        {/* Twitter Cards */}
+        <meta name="twitter:title" content="Redirecting to Your Destination" />
+        <meta name="twitter:description" content="Redirecting based on your location and device. If you are not redirected, click here." />
+        <meta name="twitter:image" content="https://www.easyurl.me/images/twitter-card.jpg" />
+      </Helmet>
+
+      {/* Fallback message for screen readers */}
+      <div aria-live="polite" role="status" style={{ display: "none" }}>
+        <p>
+          Redirecting to your destination. If you are not redirected, please click{" "}
+          <a href="/" aria-label="Go back to homepage">here</a>.
+        </p>
+      </div>
+    </>
+  );
 };
 
 export default RedirectPage;

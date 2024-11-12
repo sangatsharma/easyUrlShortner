@@ -1,7 +1,7 @@
 import * as React from "react";
 import UniqueClicksChart from "../components/UniqueClicksChart";
 
-interface IAnalyticsProps {}
+// interface IAnalyticsProps {}
 
 const Analytics: React.FunctionComponent = () => {
   const sampleData = [

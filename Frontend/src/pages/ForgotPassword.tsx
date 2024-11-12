@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import ResendOTPButton from "../components/ResendOTPButton";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const ForgotPassword: React.FC = () => {
   const [message, setMessage] = useState<string | null>("");
