@@ -1,9 +1,9 @@
-// src/components/ForgotPassword.tsx
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import ResendOTPButton from "../components/ResendOTPButton";
+import { Helmet } from "react-helmet";
 
 const ForgotPassword: React.FC = () => {
   const [message, setMessage] = useState<string | null>("");
@@ -25,7 +25,6 @@ const ForgotPassword: React.FC = () => {
     }
     try {
       setLoading(true);
-      console.log(emailFormik.values.email, otp);
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/user/verifyOtp`,
         {
@@ -37,7 +36,6 @@ const ForgotPassword: React.FC = () => {
         }
       );
       const data = response.data;
-      console.log(data);
       if (data.success) {
         setIsError(false);
         setMessage(data.message);
@@ -80,7 +78,6 @@ const ForgotPassword: React.FC = () => {
           }
         );
         const data = response.data;
-        console.log(data);
         if (data.success) {
           setIsError(false);
           setMessage("OTP sent to your email!");
@@ -92,14 +89,9 @@ const ForgotPassword: React.FC = () => {
             setMessage(null);
           }, 3000);
         }
-        // Clear message after 5 seconds
-        setTimeout(() => {
-          setMessage("");
-        }, 5000);
       } catch (err: any) {
         setIsError(true);
-        setMessage(`Failed to send otp. Please try again: ${err.message}`);
-
+        setMessage(`Failed to send OTP. Please try again: ${err.message}`);
         setTimeout(() => {
           setMessage("");
         }, 5000);
@@ -134,7 +126,6 @@ const ForgotPassword: React.FC = () => {
         }
       );
       const data = response.data;
-      console.log(data);
       if (data.success) {
         setIsError(false);
         setMessage(data.message);
@@ -164,7 +155,7 @@ const ForgotPassword: React.FC = () => {
     setOtp("");
     emailFormik.resetForm();
 
-    //    Clear message after 5 seconds
+    // Clear message after 5 seconds
     setTimeout(() => {
       setMessage("Redirecting to home page...");
       window.location.href = "/";
@@ -173,6 +164,32 @@ const ForgotPassword: React.FC = () => {
 
   return (
     <div className="flex h-screen justify-center items-center bg-gray-100">
+      <Helmet>
+        <title>Forgot Password - Easy URL Shortener</title>
+        <meta
+          name="description"
+          content="Reset your password for Easy URL Shortener. Follow the steps to recover your account."
+        />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Forgot Password - Easy URL Shortener" />
+        <meta
+          property="og:description"
+          content="Follow the simple steps to reset your password and regain access to your account on Easy URL Shortener."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.easyurl.me/forgot-password" />
+        <meta
+          name="twitter:card"
+          content="summary_large_image"
+        />
+        <meta name="twitter:title" content="Forgot Password - Easy URL Shortener" />
+        <meta
+          name="twitter:description"
+          content="Need to reset your password? Follow the steps to recover your account with Easy URL Shortener."
+        />
+        <link rel="canonical" href="https://www.easyurl.me/forgot-password" />
+      </Helmet>
+
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-6 text-center">
           {step === "request"
@@ -198,9 +215,11 @@ const ForgotPassword: React.FC = () => {
                     : ""
                 }`}
                 placeholder="Email"
+                aria-describedby="email-error"
+                aria-required="true"
               />
               {emailFormik.touched.email && emailFormik.errors.email ? (
-                <div className="text-red-500 text-sm">
+                <div id="email-error" className="text-red-500 text-sm">
                   {emailFormik.errors.email}
                 </div>
               ) : null}
@@ -209,6 +228,7 @@ const ForgotPassword: React.FC = () => {
               disabled={loading}
               type="submit"
               className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200"
+              aria-live="assertive"
             >
               {loading ? "Sending OTP..." : "Send OTP"}
             </button>
@@ -219,7 +239,6 @@ const ForgotPassword: React.FC = () => {
           <div className="space-y-4">
             <div>
               <label htmlFor="otp" className="block mb-2 text-lg">
-                {" "}
                 Enter OTP sent to your email
               </label>
               <input
@@ -229,6 +248,7 @@ const ForgotPassword: React.FC = () => {
                 onChange={(e) => setOtp(e.target.value)}
                 className="border p-3 rounded w-full"
                 placeholder="OTP"
+                aria-describedby="otp-error"
               />
             </div>
             <ResendOTPButton
@@ -240,6 +260,7 @@ const ForgotPassword: React.FC = () => {
               disabled={loading}
               onClick={handleOtpVerification}
               className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200"
+              aria-live="assertive"
             >
               {loading ? "Verifying..." : "Verify OTP"}
             </button>
@@ -259,6 +280,8 @@ const ForgotPassword: React.FC = () => {
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="border p-3 rounded w-full"
                 placeholder="New Password"
+                aria-describedby="new-password-error"
+                aria-required="true"
               />
             </div>
             <div>
@@ -272,22 +295,26 @@ const ForgotPassword: React.FC = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="border p-3 rounded w-full"
                 placeholder="Confirm Password"
+                aria-describedby="confirm-password-error"
+                aria-required="true"
               />
             </div>
             <button
-              disabled={loading}
               onClick={handlePasswordReset}
               className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200"
+              aria-live="assertive"
             >
               {loading ? "Resetting..." : "Reset Password"}
             </button>
           </div>
         )}
+
         {message && (
           <div
             className={`mt-4 text-center ${
               isError ? "text-red-500" : "text-green-500"
             }`}
+            aria-live="assertive"
           >
             {message}
           </div>

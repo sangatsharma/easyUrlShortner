@@ -1,0 +1,9 @@
+User-agent: *
+
+
+
+# Allow all other pages
+Allow: /
+
+# Sitemap
+Sitemap: https://www.easyurl.me/sitemap.xml

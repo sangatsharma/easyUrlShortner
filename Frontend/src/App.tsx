@@ -13,6 +13,7 @@ import { validateToken } from "./store/authSlice.ts";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "./store/store.ts";
+import Analytics from "./pages/Analytics.tsx";
 
 interface IAppProps {}
 
@@ -62,6 +63,16 @@ const App: React.FunctionComponent<IAppProps> = () => {
           element: (
             <PrivateRoute
               Component={Dashboard}
+              isAuthenticated={isAuthenticated}
+              loading={loading}
+            />
+          ),
+        },
+        {
+          path: "/analytics",
+          element: (
+            <PrivateRoute
+              Component={Analytics}
               isAuthenticated={isAuthenticated}
               loading={loading}
             />
