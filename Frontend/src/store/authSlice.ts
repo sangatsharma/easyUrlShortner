@@ -1,6 +1,6 @@
-// features/auth/authSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+
 import { RootState } from "../store/store";
 
 // User information interface
@@ -39,8 +39,7 @@ export const validateToken = createAsyncThunk<
         withCredentials: true,
       }
     );
-    console.log(response.data);
-    return response.data; // Assume { id, email, name, role } in the response
+    return response.data.user; // Assume { id, email, name, role } in the response
   } catch (error: any) {
     return rejectWithValue(error.response?.data || "Token validation failed");
   }
@@ -61,7 +60,8 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       state.isAuthenticated = false;
-      state.userInfo = null;    
+      state.userInfo = null;
+      state.loading = false;
     },
   },
   extraReducers: (builder) => {
@@ -87,7 +87,6 @@ const authSlice = createSlice({
 
 // Export actions and reducer
 export const { setAuthenticated, setLoading, logout } = authSlice.actions;
-;
 export default authSlice.reducer;
 // Selector to get authentication state
 export const selectAuth = (state: RootState) => state.auth;

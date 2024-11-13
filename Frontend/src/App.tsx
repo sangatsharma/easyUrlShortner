@@ -25,9 +25,10 @@ const App: React.FunctionComponent<IAppProps> = () => {
   );
 
   useEffect(() => {
-    dispatch(validateToken());
-  }, [dispatch]);
-
+    if (!isAuthenticated) {
+      dispatch(validateToken());
+    }
+  }, [isAuthenticated, dispatch]);
   const router = createBrowserRouter([
     {
       path: "/:id",

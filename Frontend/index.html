@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Title and Meta Description -->
-  <title>Easy URL Shortener - Shorten Your Links Instantly</title>
-  <meta name="description" content="Shorten your URLs easily with EasyURL.me. Manage links, track clicks, and streamline your sharing process." />
+  <!-- Title and Meta Description with multiple keywords -->
+  <title>URL Shortener - Short URL, Shorten Your Links Instantly With Link Management</title>
+  <meta name="description" content="Create a short URL easily with EasyURL.me, the best URL shortener. Manage links, track clicks, and streamline your sharing process with our efficient tool." />
 
   <!-- Open Graph Meta Tags for better social media sharing -->
-  <meta property="og:title" content="Easy URL Shortener" />
-  <meta property="og:description" content="Manage your links, shorten URLs easily, and track performance at EasyURL.me." />
+  <meta property="og:title" content="Easy URL Shortener - Short URL, URL Shortener" />
+  <meta property="og:description" content="Shorten your links instantly with EasyURL.me. Manage, track clicks, and analyze your URL performance effortlessly." />
   <meta property="og:image" content="https://www.easyurl.me/assets/og-image.png" />
   <meta property="og:url" content="https://www.easyurl.me" />
   <meta property="og:type" content="website" />
 
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Easy URL Shortener" />
-  <meta name="twitter:description" content="Shorten your links in seconds and track clicks easily with EasyURL.me." />
+  <meta name="twitter:title" content="Easy URL Shortener - Short URL, URL Shortener" />
+  <meta name="twitter:description" content="Shorten your links quickly and track clicks easily with EasyURL.me. Try our URL shortener for better link management." />
   <meta name="twitter:image" content="https://www.easyurl.me/assets/twitter-image.png" />
 
   <!-- Favicon and icon links -->
@@ -33,12 +34,30 @@
   <!-- Canonical URL to avoid duplicate content issues -->
   <link rel="canonical" href="https://www.easyurl.me" />
 
-  <!-- CSS Preload for faster load (optional) -->
+  <!-- Preload for faster resource loading -->
   <link rel="preload" href="/styles.css" as="style" />
   <link rel="preload" href="/fonts/font.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 
-  <!-- Open Graph for social media sharing (like Facebook) -->
-  <meta property="og:image" content="https://www.easyurl.me/assets/og-image.png" />
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "EasyURL.me",
+    "url": "https://www.easyurl.me",
+    "description": "EasyURL.me is a fast and secure URL shortening service that allows users to shorten and track their links.",
+    "potentialAction": {
+      "@type": "Action",
+      "name": "Shorten URL",
+      "target": "https://www.easyurl.me/{id}",
+      "urlTemplate": "https://www.easyurl.me/{id}",
+      "query-input": "required name=id"
+    },
+    <!-- "sameAs": [
+      "https://twitter.com/EasyURL",
+      "https://www.facebook.com/EasyURL"
+    ] -->
+  }
+</script>
 
 </head>
 

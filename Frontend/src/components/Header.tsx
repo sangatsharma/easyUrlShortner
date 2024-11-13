@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store/store";
-import { setLoading, setAuthenticated } from "../store/authSlice";
+import { AppDispatch, RootState } from "../store/store";
+import { setLoading, logout } from "../store/authSlice";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+
+
 interface IHeaderProps {
   isAuthenticated: boolean;
   loading: boolean;
 }
 
 const Header: React.FC<IHeaderProps> = ({ isAuthenticated, loading }) => {
+  const {userInfo } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -26,7 +32,7 @@ const Header: React.FC<IHeaderProps> = ({ isAuthenticated, loading }) => {
       const data = response.data;
       console.log(data);
       if (data.success) {
-        dispatch(setAuthenticated(null));
+        dispatch(logout());
         window.location.href = "/";
       } else {
         console.log("Failed to logout. Please try again.");
@@ -42,11 +48,11 @@ const Header: React.FC<IHeaderProps> = ({ isAuthenticated, loading }) => {
     <header className="bg-primary text-white p-4 shadow-md" role="banner">
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">
-          <a href="/" aria-label="EasyURL Homepage">
+          <Link to="/" aria-label="EasyURL Homepage">
             EasyURL.me
-          </a>
+          </Link>
         </h1>
-        <nav aria-label="Primary Navigation">
+        <nav aria-label="Main Navigation">
           {loading ? (
             <p>Loading...</p>
           ) : (
@@ -54,22 +60,23 @@ const Header: React.FC<IHeaderProps> = ({ isAuthenticated, loading }) => {
               {isAuthenticated ? (
                 <>
                   <li>
-                    <button
-                      onClick={() => {
-                        window.location.href = "/dashboard";
-                      }}
+                    <Link
+                      to="/dashboard"
                       className="text-sm hover:underline"
+                      aria-label="Go to Dashboard"
                     >
                       Dashboard
-                    </button>
+                    </Link>
                   </li>
                   <li>
-                    <button
+                    <a
                       onClick={handleLogout}
                       className="text-sm hover:underline cursor-pointer"
+                      role="button"
+                      aria-label="Logout"
                     >
                       Logout
-                    </button>
+                    </a>
                   </li>
 
                   <li>
@@ -77,13 +84,15 @@ const Header: React.FC<IHeaderProps> = ({ isAuthenticated, loading }) => {
                       {/* Dropdown Button */}
                       <button
                         onClick={toggleDropdown}
-                        className="inline-flex justify-center  w-full  text-sm font-medium text-white cursor-pointer rounded-md focus:outline-none hover:underline"
+                        className="inline-flex justify-center w-full text-sm font-medium text-white cursor-pointer rounded-md focus:outline-none hover:underline"
+                        aria-label="Settings Dropdown"
                       >
-                        Settings
+                        {userInfo?.name}
                         <svg
                           className="w-5 h-5 ml-2 -mr-1"
                           viewBox="0 0 20 20"
                           fill="currentColor"
+                          aria-hidden="true"
                         >
                           <path
                             fillRule="evenodd"
@@ -97,17 +106,20 @@ const Header: React.FC<IHeaderProps> = ({ isAuthenticated, loading }) => {
                       {isOpen && (
                         <div className="absolute right-0 z-10 w-56 mt-2 origin-top-right bg-white border border-gray-200 rounded-md shadow-lg">
                           <div className="py-1">
-                            <button className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                              Deactivate Account
-                            </button>
-                            <button
-                              onClick={() => {
-                                window.location.href = "/forgot-password";
-                              }}
-                              className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+                            <a
+                              href="/deactivate-account"
+                              className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 inline-block"
+                              aria-label="Deactivate Account"
+                            >
+                              <button>Deactivate Account</button>
+                            </a>
+                            <a
+                              href="/forgot-password"
+                              className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 inline-block"
+                              aria-label="Change Password"
                             >
                               Change Password
-                            </button>
+                            </a>
                           </div>
                         </div>
                       )}
@@ -117,12 +129,20 @@ const Header: React.FC<IHeaderProps> = ({ isAuthenticated, loading }) => {
               ) : (
                 <>
                   <li>
-                    <a href="/login" className="text-sm hover:underline">
+                    <a
+                      href="/login"
+                      className="text-sm hover:underline"
+                      aria-label="Login to your account"
+                    >
                       Login
                     </a>
                   </li>
                   <li>
-                    <a href="/signup" className="text-sm hover:underline">
+                    <a
+                      href="/signup"
+                      className="text-sm hover:underline"
+                      aria-label="Sign up for a new account"
+                    >
                       Signup
                     </a>
                   </li>
