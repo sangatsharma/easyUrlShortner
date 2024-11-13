@@ -116,9 +116,24 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
           name="description"
           content="Create an account on EasyURL.me to shorten and track your links."
         />
-        <Helmet>
-          <script type="application/ld+json">
-            {`
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Login - Easy URL Shortener" />
+        <meta
+          property="og:description"
+          content="Create an account on EasyURL.me to shorten and track your links."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.easyurl.me/signup" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Login - Easy URL Shortener" />
+        <meta
+          name="twitter:description"
+          content="Login to manage your URLs in Easy URL Shortener."
+        />
+        <link rel="canonical" href="https://www.easyurl.me/signup" />
+
+        <script type="application/ld+json">
+          {`
                 {
                   "@context": "https://schema.org",
                   "@type": "WebPage",
@@ -127,8 +142,7 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
                   "description": "Create an account on EasyURL.me to shorten and track your links."
                 }
               `}
-          </script>
-        </Helmet>
+        </script>
       </Helmet>
 
       {formType === "signup" ? (
