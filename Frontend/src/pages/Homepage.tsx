@@ -17,14 +17,7 @@ const Homepage: React.FunctionComponent<IHomepageProps> = () => {
                   "@type": "WebSite",
                   "name": "EasyURL.me",
                   "url": "https://www.easyurl.me",
-                  "description": "EasyURL.me is a fast and secure URL shortening service that allows users to shorten and track their links.",
-                  "potentialAction": {
-                    "@type": "CreateAction",
-                    "name": "Shorten URL",
-                    "target": "https://www.easyurl.me/{id}",
-                    "urlTemplate": "https://www.easyurl.me/{id}",
-                    "query-input": "required name=id"
-                  }
+                  "description": "EasyURL.me is a fast and secure URL shortening service that allows users to shorten and track their links."
                 }
               `}
         </script>
