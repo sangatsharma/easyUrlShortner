@@ -63,7 +63,7 @@ const Homepage: React.FunctionComponent<IHomepageProps> = () => {
         />
 
         {/* Canonical URL */}
-        <link rel="canonical" href="https://www.easyurl.me/" />
+        <link rel="canonical" href="https://www.easyurl.me" />
       </Helmet>
 
       <main className="flex-grow w-full ">
