@@ -66,6 +66,18 @@ const LoginForm: React.FC<ILoginFormProps> = (props) => {
   return (
     <div className="flex h-screen justify-center items-center bg-gray-100">
       <Helmet>
+        <script type="application/ld+json">
+          {`
+                {
+                  "@context": "https://schema.org",
+                  "@type": "WebPage",
+                  "name": "Login - EasyURL.me",
+                  "url": "https://www.easyurl.me/login",
+                  "description": "Login to EasyURL.me to access your account and manage your shortened links."
+                }
+              `}
+        </script>
+
         <title>Login - Easy URL Shortener</title>
         <meta
           name="description"

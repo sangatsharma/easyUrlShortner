@@ -31,7 +31,10 @@ const Dashboard: React.FunctionComponent = () => {
           property="og:description"
           content="Manage your links, track their performance, and make adjustments as needed at EasyURL.me."
         />
-        <meta property="og:image" content="https://www.easyurl.me/assets/og-image.png" />
+        <meta
+          property="og:image"
+          content="https://www.easyurl.me/assets/og-image.png"
+        />
         <meta property="og:url" content="https://www.easyurl.me/dashboard" />
         <meta property="og:type" content="website" />
 
@@ -49,6 +52,20 @@ const Dashboard: React.FunctionComponent = () => {
 
         {/* Canonical URL */}
         <link rel="canonical" href="https://www.easyurl.me/dashboard" />
+
+        <Helmet>
+          <script type="application/ld+json">
+            {`
+                {
+                  "@context": "https://schema.org",
+                  "@type": "WebPage",
+                  "name": "Dashboard - EasyURL.me",
+                  "url": "https://www.easyurl.me/dashboard",
+                  "description": "Your personal dashboard to manage and track your shortened URLs on EasyURL.me."
+                }
+              `}
+          </script>
+        </Helmet>
       </Helmet>
 
       <main className="flex-grow w-full ">

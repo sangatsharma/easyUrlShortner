@@ -112,6 +112,23 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
     <div className="flex h-screen justify-center items-center bg-gray-100">
       <Helmet>
         <title>Sign Up - EasyURL</title>
+        <meta
+          name="description"
+          content="Create an account on EasyURL.me to shorten and track your links."
+        />
+        <Helmet>
+          <script type="application/ld+json">
+            {`
+                {
+                  "@context": "https://schema.org",
+                  "@type": "WebPage",
+                  "name": "Signup - EasyURL.me",
+                  "url": "https://www.easyurl.me/signup",
+                  "description": "Create an account on EasyURL.me to shorten and track your links."
+                }
+              `}
+          </script>
+        </Helmet>
       </Helmet>
 
       {formType === "signup" ? (

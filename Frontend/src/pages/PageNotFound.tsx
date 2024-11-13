@@ -23,6 +23,19 @@ const PageNotFound: React.FunctionComponent<IPageNotFoundProps> = ({
           name="description"
           content="Sorry, the page you are looking for does not exist. Please check the URL or go back to the homepage."
         />
+        <Helmet>
+          <script type="application/ld+json">
+            {`
+                {
+                  "@context": "https://schema.org",
+                  "@type": "WebPage",
+                  "name": "404 Not Found - EasyURL.me",
+                  "url": "https://www.easyurl.me/404",
+                  "description": "The page you are looking for doesn't exist."
+                }
+              `}
+          </script>
+        </Helmet>
       </Helmet>
       <Header isAuthenticated={isAuthenticated} loading={loading} />
       <div className="flex flex-col items-center justify-center flex-grow text-center py-12">

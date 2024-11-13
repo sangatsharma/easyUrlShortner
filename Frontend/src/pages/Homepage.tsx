@@ -10,6 +10,25 @@ const Homepage: React.FunctionComponent<IHomepageProps> = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 p-2">
       <Helmet>
+        <script type="application/ld+json">
+          {`
+                {
+                  "@context": "https://schema.org",
+                  "@type": "WebSite",
+                  "name": "EasyURL.me",
+                  "url": "https://www.easyurl.me",
+                  "description": "EasyURL.me is a fast and secure URL shortening service that allows users to shorten and track their links.",
+                  "potentialAction": {
+                    "@type": "CreateAction",
+                    "name": "Shorten URL",
+                    "target": "https://www.easyurl.me/{id}",
+                    "urlTemplate": "https://www.easyurl.me/{id}",
+                    "query-input": "required name=id"
+                  }
+                }
+              `}
+        </script>
+
         {/* Title and Meta Description */}
         <title>Easy URL Shortener - Shorten Your Links Instantly</title>
         <meta
