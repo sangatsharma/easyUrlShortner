@@ -53,9 +53,8 @@ const Dashboard: React.FunctionComponent = () => {
         {/* Canonical URL */}
         <link rel="canonical" href="https://www.easyurl.me/dashboard" />
 
-        <Helmet>
-          <script type="application/ld+json">
-            {`
+        <script type="application/ld+json">
+          {`
                 {
                   "@context": "https://schema.org",
                   "@type": "WebPage",
@@ -64,8 +63,7 @@ const Dashboard: React.FunctionComponent = () => {
                   "description": "Your personal dashboard to manage and track your shortened URLs on EasyURL.me."
                 }
               `}
-          </script>
-        </Helmet>
+        </script>
       </Helmet>
 
       <main className="flex-grow w-full ">
