@@ -1,9 +1,20 @@
 User-agent: *
 
 
-
-# Allow all other pages
+# Allow homepage with or without trailing slash
 Allow: /
+
+# Disallow all random short URLs (pattern-based)
+Disallow: /*/ 
+
+# Disallow crawling of all random short URLs (pattern-based)
+Disallow: /*/
+
+# Allow listed pages in the sitemap
+Allow: /dashboard
+Allow: /login
+Allow: /signup
+
 
 # Sitemap
 Sitemap: https://www.easyurl.me/sitemap.xml

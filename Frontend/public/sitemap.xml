@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
   <!-- Homepage -->
   <url>
     <loc>https://www.easyurl.me/</loc>
     <lastmod>2024-11-12</lastmod>
-    <changefreq>monthly</changefreq>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-  
+
   <!-- Dashboard page -->
   <url>
     <loc>https://www.easyurl.me/dashboard</loc>
     <lastmod>2024-11-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <!-- Login page -->
@@ -24,7 +25,7 @@
     <priority>0.8</priority>
   </url>
 
-    <!-- Login page -->
+  <!-- Signup page -->
   <url>
     <loc>https://www.easyurl.me/signup</loc>
     <lastmod>2024-11-10</lastmod>
@@ -32,15 +33,36 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Terms and Conditions -->
+  <!-- <url>
+    <loc>https://www.easyurl.me/terms</loc>
+    <lastmod>2024-11-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url> -->
 
+  <!-- Privacy Policy -->
+<!-- <url>
+    <loc>https://www.easyurl.me/privacy</loc>
+    <lastmod>2024-11-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url> -->
 
-  <!-- Sitemap -->
+  <!-- Custom 404 Page (Optional) -->
+  <!-- <url>
+    <loc>https://www.easyurl.me/404</loc>
+    <lastmod>2024-11-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url> -->
+
+  <!-- Sitemap URL -->
   <url>
     <loc>https://www.easyurl.me/sitemap.xml</loc>
     <lastmod>2024-11-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.1</priority>
   </url>
 
-  <!-- Add other important pages here -->
 </urlset>
