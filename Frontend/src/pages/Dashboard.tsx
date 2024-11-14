@@ -22,6 +22,7 @@ const Dashboard: React.FunctionComponent = () => {
         <meta
           name="description"
           content="View and manage your shortened links, track their performance, and customize them easily with EasyURL.me."
+        
         />
         <meta name="robots" content="index, follow" />
 
@@ -29,7 +30,7 @@ const Dashboard: React.FunctionComponent = () => {
         <meta property="og:title" content="Dashboard - Easy URL Shortener" />
         <meta
           property="og:description"
-          content="Manage your links, track their performance, and make adjustments as needed at EasyURL.me."
+          content="View and manage your shortened links, track their performance, and customize them easily with EasyURL.me."
         />
         <meta
           property="og:image"

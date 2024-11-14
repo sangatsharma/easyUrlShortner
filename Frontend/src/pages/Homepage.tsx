@@ -31,10 +31,11 @@ const Homepage: React.FunctionComponent<IHomepageProps> = () => {
         <meta name="robots" content="index, follow" />
 
         {/* Open Graph Meta Tags */}
-        <meta property="og:title" content="Easy URL Shortener" />
+        <meta property="og:title" content="URL Shortener - Shorten Your Links Instantly" />
         <meta
           property="og:description"
-          content="Manage your links, shorten URLs easily, and track performance at EasyURL.me."
+          content="Create a short URL easily with EasyURL.me, the best URL shortener. Manage links, track clicks, and streamline your sharing process with our efficient tool."
+          data-rh="true"
         />
         <meta
           property="og:image"

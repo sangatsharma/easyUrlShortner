@@ -117,7 +117,7 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
           content="Create an account on EasyURL.me to shorten and track your links."
         />
         <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Login - Easy URL Shortener" />
+        <meta property="og:title" content="Sign Up - Easy URL Shortener" />
         <meta
           property="og:description"
           content="Create an account on EasyURL.me to shorten and track your links."
