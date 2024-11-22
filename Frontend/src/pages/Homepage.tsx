@@ -29,9 +29,16 @@ const Homepage: React.FunctionComponent<IHomepageProps> = () => {
           content="Shorten your URLs easily with EasyURL.me. Manage links, track clicks, and streamline your sharing process."
         />
         <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content="URL Shortener, Link Shortener, Free URL Shortener, Custom Short Links, Shorten URLs Instantly, URL Management Tool, Track Link Clicks, URL Analytics, Short Link Generator, URL Shortener for Social Media"
+        />
 
         {/* Open Graph Meta Tags */}
-        <meta property="og:title" content="URL Shortener - Shorten Your Links Instantly" />
+        <meta
+          property="og:title"
+          content="URL Shortener - Shorten Your Links Instantly"
+        />
         <meta
           property="og:description"
           content="Create a short URL easily with EasyURL.me, the best URL shortener. Manage links, track clicks, and streamline your sharing process with our efficient tool."

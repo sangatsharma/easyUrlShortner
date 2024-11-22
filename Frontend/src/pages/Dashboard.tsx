@@ -22,7 +22,10 @@ const Dashboard: React.FunctionComponent = () => {
         <meta
           name="description"
           content="View and manage your shortened links, track their performance, and customize them easily with EasyURL.me."
-        
+        />
+        <meta
+          name="keywords"
+          content="Short URL Management, Track Link Clicks, URL Analytics, Short Link Generator, URL Shortener for Social Media"
         />
         <meta name="robots" content="index, follow" />
 
