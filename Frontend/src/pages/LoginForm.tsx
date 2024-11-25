@@ -97,7 +97,7 @@ const LoginForm: React.FC<ILoginFormProps> = (props) => {
           name="twitter:description"
           content="Login to manage your URLs in Easy URL Shortener."
         />
-        <link rel="canonical" href="https://www.easyurl.me/login" />
+        <link rel="canonical" href="/login" />
       </Helmet>
 
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">

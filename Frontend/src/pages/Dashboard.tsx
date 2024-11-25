@@ -55,7 +55,7 @@ const Dashboard: React.FunctionComponent = () => {
         />
 
         {/* Canonical URL */}
-        <link rel="canonical" href="https://www.easyurl.me/dashboard" />
+        <link rel="canonical" href="/dashboard" />
 
         <script type="application/ld+json">
           {`

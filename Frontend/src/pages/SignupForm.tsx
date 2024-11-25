@@ -130,7 +130,7 @@ const SignupForm: React.FC<ISignupFormProps> = (props) => {
           name="twitter:description"
           content="Login to manage your URLs in Easy URL Shortener."
         />
-        <link rel="canonical" href="https://www.easyurl.me/signup" />
+        <link rel="canonical" href="/signup" />
 
         <script type="application/ld+json">
           {`
