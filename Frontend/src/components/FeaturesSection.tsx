@@ -14,7 +14,7 @@ const FeaturesSection: React.FC = () => {
       icon: <FaThumbsUp className="text-4xl text-primary" />,
       title: "User-Friendly",
       description:
-        "Easily shorten URLs with a simple, intuitive interface on easyurl.me.",
+        "Easily shorten URLs with a simple, intuitive interface on EasyURL.",
     },
     {
       icon: <FaLink className="text-4xl text-primary" />,

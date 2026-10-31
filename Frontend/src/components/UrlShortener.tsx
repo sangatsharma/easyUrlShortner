@@ -46,7 +46,7 @@ const UrlShortener: React.FC = () => {
         { withCredentials: true }
       );
       console.log(response.data);
-      setShortLink(`easyurl.me/${response.data.url.shortId}`);
+      setShortLink(`${window.location.host}/${response.data.url.shortId}`);
      if(response.data.url.originalUrl){
       dispatch(addLink(response.data.url));
      }

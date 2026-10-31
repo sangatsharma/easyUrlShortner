@@ -40,7 +40,7 @@ const UrlTable: React.FunctionComponent = () => {
   }, [qrLinks]);
   const fetchQrCodes = async () => {
     const generatedQrCodes: (string | undefined)[] = await Promise.all(
-      links.map((item) => generateQrCode(`https://easyurl.me/${item.shortId}`))
+      links.map((item) => generateQrCode(`${window.location.origin}/${item.shortId}`))
     );
     setQrLinks(generatedQrCodes);
   };
@@ -49,7 +49,7 @@ const UrlTable: React.FunctionComponent = () => {
   const downloadQrCode = (url: string | undefined) => {
     if (!url) {
       console.error("Error downloading QR code: URL is undefined");
-      url = "https://easyurl.me";
+      url = window.location.origin;
     }
     const link = document.createElement("a");
     link.href = url;
@@ -111,7 +111,7 @@ const UrlTable: React.FunctionComponent = () => {
                     <td className="border border-gray-300">
                       <div className="w-72 mx-auto">
                         <ShortLinkDisplay
-                          shortLink={`easyurl.me/${item.shortId}`}
+                          shortLink={`${window.location.host}/${item.shortId}`}
                           hide={true}
                         />
                       </div>
