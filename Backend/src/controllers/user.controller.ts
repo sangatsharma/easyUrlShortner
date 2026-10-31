@@ -232,7 +232,7 @@ export const logoutHandler = async (
     res.clearCookie("token", {
       httpOnly: true, // Ensures cookie is not accessible via client-side scripts
       secure: true, // Send cookie over HTTPS only in production
-      sameSite: "lax", // Helps prevent CSRF attacks
+      sameSite: "none", // Must match how the cookie was set, or logout won't clear it
       path: "/", // Ensure it covers the entire site
     });
 

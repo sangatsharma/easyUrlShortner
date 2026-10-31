@@ -17,8 +17,9 @@ const generateAndSetCookie = (res, user) => {
         // secure: (process.env.NODE_ENV as string) === "PROD",
         secure: true,
         httpOnly: true,
-        // sameSite: (process.env.NODE_ENV as string) === "PROD" ? "none" : "lax",
-        sameSite: "lax",
+        // Frontend and API sit on different *.vercel.app sites, so the cookie must be
+        // allowed on cross-site requests (localhost counts as secure, so dev works too)
+        sameSite: "none",
         path: "/", // cookie will be sent to all routes
         // domain:
         //   (process.env.NODE_ENV as string) === "PROD" ? ".vercel.app" : "localhost",
