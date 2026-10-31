@@ -26,12 +26,6 @@ const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { originalUrl } = req.body;
         if (!originalUrl) {
             res.status(400).json({ success: false, error: "Invalid URL." });
-        }
-        console.log("checking URL if exists in cache:");
-        const cachedUrl = yield (0, redisCache_1.getURLFromCache)(originalUrl);
-        if (cachedUrl !== "") {
-            console.log("URL already exists in cache:", cachedUrl);
-            res.status(200).json({ success: true, url: { shortId: cachedUrl } });
             return;
         }
         let expiryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); //3 days from now
@@ -40,18 +34,38 @@ const createUrl = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (userId) {
             expiryDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
         }
-        console.log("URL dont  exists in cache, creating new URL:");
+        // Reuse this owner's existing link for the same URL. Checked in MongoDB, not
+        // Redis, so it works with the cache down and never returns another user's link
+        const existing = yield db_model_1.default.findOne({ originalUrl, userId }).exec();
+        if (existing) {
+            console.log("URL already shortened by this owner:", existing.shortId);
+            res.status(200).json({ success: true, url: existing, userId: userId });
+            return;
+        }
         const shortId = yield (0, generateUniqueId_1.generateUniqueId)();
-        const url = yield db_model_1.default.create({
-            originalUrl,
-            shortId,
-            userId,
-            expiryDate: expiryDate,
-        });
-        // Cache the new entry in Redis
-        (0, redisCache_1.setURLInCache)(shortId, JSON.stringify(url));
-        res.status(201).json({ success: true, url: url, userId: userId });
-        return;
+        try {
+            const url = yield db_model_1.default.create({
+                originalUrl,
+                shortId,
+                userId,
+                expiryDate: expiryDate,
+            });
+            // Cache the new entry in Redis
+            (0, redisCache_1.setURLInCache)(shortId, JSON.stringify(url));
+            res.status(201).json({ success: true, url: url, userId: userId });
+            return;
+        }
+        catch (error) {
+            // Two identical requests raced past the lookup: hand back the winner's link
+            if (error.code === 11000) {
+                const url = yield db_model_1.default.findOne({ originalUrl, userId }).exec();
+                if (url) {
+                    res.status(200).json({ success: true, url: url, userId: userId });
+                    return;
+                }
+            }
+            throw error;
+        }
     }
     catch (error) {
         console.error("Error creating URL:", error);

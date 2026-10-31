@@ -47,7 +47,8 @@ const UrlShortener: React.FC = () => {
       );
       console.log(response.data);
       setShortLink(`${window.location.host}/${response.data.url.shortId}`);
-     if(response.data.url.originalUrl){
+     // 201 = new link; 200 = this URL was already shortened and is in the table
+     if(response.status === 201 && response.data.url.originalUrl){
       dispatch(addLink(response.data.url));
      }
     } catch (err) {

@@ -24,10 +24,6 @@ export const setURLInCache = async (shortId: string, originalURL: string) => {
     await redisClient.set(shortId, originalURL, {
       EX: 3600, // Set the expiration time to 3600 seconds
     });
-    const longUrl = JSON.parse(originalURL);
-    await redisClient.set(longUrl.originalUrl, shortId, {
-      EX: 3600, // Set the expiration time to 3600 seconds
-    });
   }
 };
 

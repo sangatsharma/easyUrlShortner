@@ -16,12 +16,6 @@ export const createUrl = async (
     const { originalUrl } = req.body;
     if (!originalUrl) {
       res.status(400).json({ success: false, error: "Invalid URL." });
-    }
-    console.log("checking URL if exists in cache:");
-    const cachedUrl = await getURLFromCache(originalUrl);
-    if (cachedUrl !== "") {
-      console.log("URL already exists in cache:", cachedUrl);
-      res.status(200).json({ success: true, url: { shortId: cachedUrl } });
       return;
     }
 
@@ -32,19 +26,39 @@ export const createUrl = async (
       expiryDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
     }
 
-    console.log("URL dont  exists in cache, creating new URL:");
-    const shortId = await generateUniqueId();
-    const url = await easyUrlModel.create({
-      originalUrl,
-      shortId,
-      userId,
-      expiryDate: expiryDate,
-    });
+    // Reuse this owner's existing link for the same URL. Checked in MongoDB, not
+    // Redis, so it works with the cache down and never returns another user's link
+    const existing = await easyUrlModel.findOne({ originalUrl, userId }).exec();
+    if (existing) {
+      console.log("URL already shortened by this owner:", existing.shortId);
+      res.status(200).json({ success: true, url: existing, userId: userId });
+      return;
+    }
 
-    // Cache the new entry in Redis
-    setURLInCache(shortId, JSON.stringify(url));
-    res.status(201).json({ success: true, url: url, userId: userId });
-    return;
+    const shortId = await generateUniqueId();
+    try {
+      const url = await easyUrlModel.create({
+        originalUrl,
+        shortId,
+        userId,
+        expiryDate: expiryDate,
+      });
+
+      // Cache the new entry in Redis
+      setURLInCache(shortId, JSON.stringify(url));
+      res.status(201).json({ success: true, url: url, userId: userId });
+      return;
+    } catch (error) {
+      // Two identical requests raced past the lookup: hand back the winner's link
+      if ((error as { code?: number }).code === 11000) {
+        const url = await easyUrlModel.findOne({ originalUrl, userId }).exec();
+        if (url) {
+          res.status(200).json({ success: true, url: url, userId: userId });
+          return;
+        }
+      }
+      throw error;
+    }
   } catch (error) {
     console.error("Error creating URL:", error);
     res.status(500).json({ success: false, error: "Failed to create URL." });

@@ -33,10 +33,6 @@ const setURLInCache = (shortId, originalURL) => __awaiter(void 0, void 0, void 0
         yield redisConfig_1.redisClient.set(shortId, originalURL, {
             EX: 3600, // Set the expiration time to 3600 seconds
         });
-        const longUrl = JSON.parse(originalURL);
-        yield redisConfig_1.redisClient.set(longUrl.originalUrl, shortId, {
-            EX: 3600, // Set the expiration time to 3600 seconds
-        });
     }
 });
 exports.setURLInCache = setURLInCache;

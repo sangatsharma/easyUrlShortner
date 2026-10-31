@@ -21,7 +21,6 @@ const urlSchema = new mongoose.Schema<IUrl>({
   },
   originalUrl: {
     type: String,
-    unique: true,
     index: true, // Index on originalUrl for faster searches
   },
   uniqueClicks: {
@@ -50,6 +49,10 @@ const urlSchema = new mongoose.Schema<IUrl>({
     default: false,
   },
 });
+
+// One short link per URL per owner (anonymous links share userId null), so
+// different users can shorten the same URL and each gets their own link
+urlSchema.index({ originalUrl: 1, userId: 1 }, { unique: true });
 
 // Create the model from the schema
 const easyUrlModel = mongoose.model<IUrl>("easyUrl", urlSchema);
